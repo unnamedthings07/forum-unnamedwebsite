@@ -11,7 +11,6 @@
         /* --- CORE VARIABLES --- */
         :root { 
             --color-red: #CD201F; 
-            --color-red-dim: #8a1515;
             --color-black: #050505; 
             --color-dark: #111;
             --color-border: #333;
@@ -49,9 +48,8 @@
         .nav-link span { color: var(--color-red); }
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
         
-        /* --- USER WIDGET --- */
+        /* USER WIDGET */
         .user-widget { position: relative; display: flex; align-items: center; }
-        
         .btn-login { 
             background: transparent; border: 1px solid #444; color: #fff; 
             padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
@@ -63,20 +61,16 @@
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #444; }
         .user-name { font-family: var(--font-head); font-size: 0.9rem; color: var(--color-red); }
 
-        /* DROPDOWN MENU */
+        /* DROPDOWN */
         .profile-dropdown {
-            display: none; 
-            position: absolute; top: 100%; right: 0;
+            display: none; position: absolute; top: 100%; right: 0;
             width: 200px; background: rgba(10, 10, 10, 0.95);
             border: 1px solid #333; backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             padding: 10px; z-index: 2000; margin-top: 5px;
         }
-        .profile-dropdown::before {
-            content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px;
-        }
+        .profile-dropdown::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; }
         .user-profile:hover .profile-dropdown, .profile-dropdown:hover { display: block; }
-
         .dropdown-item {
             width: 100%; background: none; border: none; text-align: left;
             color: #ccc; font-family: var(--font-mono); font-size: 0.9rem;
@@ -91,7 +85,7 @@
         .crumb-link:hover { color: var(--color-red); }
         .crumb-active { color: #fff; }
 
-        /* --- FORUM INDEX --- */
+        /* --- FORUM STYLES --- */
         .category-block { margin-bottom: 2rem; border: 1px solid var(--color-border); background: #0a0a0a; }
         .cat-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border); }
         .cat-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--color-red); letter-spacing: 1px; }
@@ -125,6 +119,13 @@
         /* BUTTONS */
         .btn-action { background: var(--color-red); color: #fff; border: none; padding: 10px 25px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
         .btn-action:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
+
+        /* PAGINATION CONTROLS */
+        .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; border-top: 1px solid #333; padding-top: 20px; }
+        .page-btn { background: #111; border: 1px solid #333; color: #fff; padding: 8px 20px; cursor: pointer; font-family: var(--font-head); transition: 0.3s; }
+        .page-btn:hover { border-color: var(--color-red); color: var(--color-red); }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #333; color: #666; }
+        .page-info { font-family: var(--font-mono); color: #666; }
 
         /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
@@ -189,6 +190,13 @@
 
         <div id="viewThread" class="hidden">
             <div id="threadContent"></div>
+            
+            <div class="pagination-bar">
+                <button id="btnPrevPage" class="page-btn">&lt; PREV</button>
+                <span id="pageIndicator" class="page-info">PAGE 1</span>
+                <button id="btnNextPage" class="page-btn">NEXT &gt;</button>
+            </div>
+
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
@@ -217,7 +225,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, onSnapshot, limit, startAfter, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -233,6 +241,12 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         let currentUser = null;
+
+        // PAGINATION STATE
+        let currentThreadId = null;
+        let currentPage = 1;
+        const POSTS_PER_PAGE = 15;
+        let pageCursors = {}; // Stores last doc of each page to start next one
 
         const FORUM_DATA = [
             {
@@ -310,6 +324,7 @@
             updateBreadcrumbs([{text: b.title, active: true}]);
             const list = document.getElementById('threadListContainer');
             list.innerHTML = "<div style='padding:20px; color:#666;'>Scanning...</div>";
+            
             const q = query(collection(db, "threads"), where("boardId", "==", bid), orderBy("timestamp", "desc"));
             onSnapshot(q, (s) => {
                 list.innerHTML = "";
@@ -324,31 +339,92 @@
             });
         }
 
-        let activeThreadId = null;
+        // --- NEW THREAD PAGINATION LOGIC ---
         async function renderThread(tid) {
-            activeThreadId = tid;
+            currentThreadId = tid;
+            currentPage = 1;
+            pageCursors = {}; // Reset state
+            
             document.getElementById('viewThread').classList.remove('hidden');
             const c = document.getElementById('threadContent');
             c.innerHTML = "Loading...";
+            
+            // 1. Fetch OP
             const snap = await getDoc(doc(db, "threads", tid));
             if(!snap.exists()) return navigate('/');
             const tData = snap.data();
+            
             const b = findBoardInfo(tData.boardId);
             updateBreadcrumbs([{text: b ? b.title : "...", onclick: `window.navToBoard('${tData.boardId}')`}, {text: tData.title, active: true}]);
+            
+            // 2. Render Header (OP)
             c.innerHTML = `<h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
-            ${buildPostHTML(tData, true)}<div id="replies-container"></div>`;
-            const q = query(collection(db, "posts"), where("threadId", "==", tid), orderBy("timestamp", "asc"));
-            onSnapshot(q, (s) => {
-                const rc = document.getElementById('replies-container'); rc.innerHTML = "";
-                s.forEach(d => rc.innerHTML += buildPostHTML(d.data(), false));
-            });
+            ${buildPostHTML(tData, true)}
+            <div id="replies-container"></div>`;
+            
+            // 3. Load First Page
+            loadPosts(1);
         }
+
+        async function loadPosts(page) {
+            const container = document.getElementById('replies-container');
+            const btnPrev = document.getElementById('btnPrevPage');
+            const btnNext = document.getElementById('btnNextPage');
+            const pageInd = document.getElementById('pageIndicator');
+            
+            container.innerHTML = "<div style='color:#666; padding:20px;'>Loading segment...</div>";
+            
+            // Build Query
+            let q = query(
+                collection(db, "posts"), 
+                where("threadId", "==", currentThreadId), 
+                orderBy("timestamp", "asc"), 
+                limit(POSTS_PER_PAGE)
+            );
+
+            // If page > 1, start after previous page's last doc
+            if (page > 1 && pageCursors[page - 1]) {
+                q = query(
+                    collection(db, "posts"), 
+                    where("threadId", "==", currentThreadId), 
+                    orderBy("timestamp", "asc"), 
+                    startAfter(pageCursors[page - 1]),
+                    limit(POSTS_PER_PAGE)
+                );
+            }
+
+            const snapshot = await getDocs(q);
+            container.innerHTML = "";
+            
+            snapshot.forEach(doc => {
+                container.innerHTML += buildPostHTML(doc.data(), false);
+            });
+
+            // Store last doc for next page
+            if (!snapshot.empty) {
+                const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+                pageCursors[page] = lastVisible;
+            }
+
+            // Update Controls
+            currentPage = page;
+            pageInd.innerText = `PAGE ${currentPage}`;
+            btnPrev.disabled = (currentPage === 1);
+            // Disable Next if we fetched fewer than limit (end of list)
+            btnNext.disabled = (snapshot.docs.length < POSTS_PER_PAGE);
+        }
+
+        // Pagination Buttons
+        document.getElementById('btnPrevPage').addEventListener('click', () => {
+            if (currentPage > 1) loadPosts(currentPage - 1);
+        });
+        document.getElementById('btnNextPage').addEventListener('click', () => {
+            loadPosts(currentPage + 1);
+        });
 
         function buildPostHTML(d, isOP) {
             const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : "---";
             const color = isOP ? "var(--color-red)" : "#666";
-            
-            // REMOVED: Role assignment (Operator/Agent)
             
             return `<div class="post-container"><div class="post-header"><span>${date}</span><span>${isOP ? '#1' : 'REPLY'}</span></div>
             <div class="post-layout"><div class="post-user-col"><img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
@@ -399,6 +475,8 @@
                 uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
             document.getElementById('replyInput').value = "";
+            // Reload current page to see new post
+            loadPosts(currentPage);
         });
 
         handleRoute();
