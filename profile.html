@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Profile // Unnamed Things</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root { 
+            --color-red: #CD201F; 
+            --color-black: #050505; 
+            --color-dark: #111;
+            --color-border: #333;
+            --font-head: 'Oswald', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'Special Elite', cursive;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--color-black);
+            color: #e0e0e0;
+            font-family: var(--font-body);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(5,5,5,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-logo { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--color-red); }
+        .brand-text { font-family: var(--font-mono); font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
+        .brand-text span { color: var(--color-red); }
+
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-link { 
+            font-family: var(--font-mono); color: #ccc; text-decoration: none; font-size: 0.9rem; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
+        
+        /* USER WIDGET */
+        .user-widget { position: relative; display: flex; align-items: center; }
+        .user-profile { display: none; align-items: center; gap: 10px; cursor: pointer; padding-bottom:10px; margin-bottom:-10px; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #444; }
+        .user-name { font-family: var(--font-head); font-size: 0.9rem; color: var(--color-red); }
+
+        /* DROPDOWN */
+        .profile-dropdown {
+            display: none; position: absolute; top: 100%; right: 0;
+            width: 200px; background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 10px; z-index: 2000; margin-top: 5px;
+        }
+        .profile-dropdown::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; }
+        .user-profile:hover .profile-dropdown, .profile-dropdown:hover { display: block; }
+        .dropdown-item {
+            width: 100%; background: none; border: none; text-align: left;
+            color: #ccc; font-family: var(--font-mono); font-size: 0.9rem;
+            padding: 8px 10px; cursor: pointer; transition: color 0.3s; display: block; text-decoration: none;
+        }
+        .dropdown-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* --- PROFILE LAYOUT --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 3rem 20px; }
+        
+        .profile-header {
+            display: flex; gap: 30px; align-items: center; margin-bottom: 3rem;
+            background: #111; padding: 2rem; border: 1px solid #333;
+        }
+        .large-avatar { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--color-red); object-fit: cover; }
+        .header-info h1 { font-family: var(--font-head); font-size: 2rem; margin-bottom: 5px; color: #fff; }
+        .header-info p { font-family: var(--font-mono); color: #666; font-size: 0.9rem; }
+
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .section-card { background: #0a0a0a; border: 1px solid #222; padding: 2rem; }
+        .section-title { font-family: var(--font-head); color: var(--color-red); margin-bottom: 1.5rem; font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-family: var(--font-mono); font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+        input[type="text"], input[type="password"], textarea { 
+            width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; font-family: var(--font-body);
+        }
+        input:focus, textarea:focus { border-color: var(--color-red); outline: none; }
+        textarea { resize: vertical; min-height: 100px; }
+
+        .btn-save { 
+            background: var(--color-red); color: #fff; border: none; padding: 12px 30px; 
+            font-family: var(--font-head); cursor: pointer; transition: 0.3s; width: 100%;
+        }
+        .btn-save:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
+
+        .status-msg { text-align: center; margin-top: 10px; font-family: var(--font-mono); font-size: 0.8rem; min-height: 20px; }
+        .success { color: #00ff00; }
+        .error { color: red; }
+
+        @media (max-width: 768px) {
+            .settings-grid { grid-template-columns: 1fr; }
+            .profile-header { flex-direction: column; text-align: center; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index" class="nav-brand">
+            <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
+            <div class="brand-text"><span>U</span>nnamed <span>T</span>hings // SETTINGS</div>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link"><span>M</span>AIN DATABASE</a></li>
+            <li><a href="index" class="nav-link"><span>F</span>ORUM INDEX</a></li>
+        </ul>
+
+        <div class="user-widget">
+            <div id="navProfile" class="user-profile">
+                <img id="navAvatar" src="" class="user-avatar">
+                <span id="navName" class="user-name">USER</span>
+                <div class="profile-dropdown">
+                    <a href="profile" class="dropdown-item" style="color:var(--color-red);">PROFILE SETTINGS</a>
+                    <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-header">
+            <img id="headerAvatar" src="" class="large-avatar">
+            <div class="header-info">
+                <h1 id="headerName">LOADING AGENT...</h1>
+                <p id="headerEmail">Validating credentials...</p>
+                <p id="headerRole" style="color:var(--color-red); margin-top:5px; border:1px solid #333; display:inline-block; padding:2px 8px; font-size:0.7rem;">ESTABLISHED MURDERINO</p>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            
+            <div class="section-card">
+                <h3 class="section-title">PUBLIC DOSSIER</h3>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label">DISPLAY NAME (CODENAME)</label>
+                        <input type="text" id="inputName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">AVATAR URL (IMAGE LINK)</label>
+                        <input type="text" id="inputPhoto" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">BIO / STATUS REPORT</label>
+                        <textarea id="inputBio" placeholder="Enter your bio..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">SOCIAL LINK (INSTAGRAM/X)</label>
+                        <input type="text" id="inputSocial" placeholder="@username">
+                    </div>
+                    <button type="submit" class="btn-save">UPDATE DOSSIER</button>
+                    <div id="profileMsg" class="status-msg"></div>
+                </form>
+            </div>
+
+            <div class="section-card">
+                <h3 class="section-title">SECURITY CLEARANCE</h3>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label class="form-label">NEW PASSWORD</label>
+                        <input type="password" id="inputPass" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CONFIRM PASSWORD</label>
+                        <input type="password" id="inputPassConfirm" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-save" style="background:#333; border:1px solid #555;">CHANGE PASSWORD</button>
+                    <div id="passMsg" class="status-msg"></div>
+                </form>
+                <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid #222;">
+                    <p style="color:#666; font-size:0.8rem; font-family:var(--font-mono);">
+                        NOTE: Updating sensitive data may require re-authentication.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, updateProfile, updatePassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwIMRuv26pcAndpd36EkLbUpSGvh6ptSY",
+            authDomain: "unnamed-things-website-70cf7.firebaseapp.com",
+            projectId: "unnamed-things-website-70cf7",
+            storageBucket: "unnamed-things-website-70cf7.firebasestorage.app",
+            messagingSenderId: "293788800527",
+            appId: "1:293788800527:web:575a1fd1f60d6361f3357a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let currentUser = null;
+
+        // AUTH LISTENER
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Navbar
+                document.getElementById('navProfile').style.display = 'flex';
+                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+                document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
+
+                // Profile Header
+                document.getElementById('headerAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+                document.getElementById('headerName').innerText = (user.displayName || "UNKNOWN AGENT").toUpperCase();
+                document.getElementById('headerEmail').innerText = user.email;
+
+                // Pre-fill Forms (Auth Data)
+                document.getElementById('inputName').value = user.displayName || "";
+                document.getElementById('inputPhoto').value = user.photoURL || "";
+
+                // Fetch Extended Data (Bio/Socials) from Firestore
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('inputBio').value = data.bio || "";
+                    document.getElementById('inputSocial').value = data.social || "";
+                }
+
+            } else {
+                // Not logged in -> Redirect to login
+                window.location.href = "login";
+            }
+        });
+
+        // UPDATE PROFILE (Name, Photo, Bio, Socials)
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('profileMsg');
+            const btn = e.target.querySelector('button');
+            
+            const name = document.getElementById('inputName').value;
+            const photo = document.getElementById('inputPhoto').value;
+            const bio = document.getElementById('inputBio').value;
+            const social = document.getElementById('inputSocial').value;
+
+            btn.innerText = "UPDATING...";
+            msg.innerText = "";
+
+            try {
+                // 1. Update Auth Profile (Basic Info)
+                await updateProfile(currentUser, {
+                    displayName: name,
+                    photoURL: photo
+                });
+
+                // 2. Update Firestore (Extended Info)
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    bio: bio,
+                    social: social,
+                    updatedAt: new Date()
+                }, { merge: true });
+
+                msg.className = "status-msg success";
+                msg.innerText = "PROFILE UPDATED SUCCESSFULLY";
+                btn.innerText = "UPDATE DOSSIER";
+                
+                // Refresh visuals immediately
+                document.getElementById('headerName').innerText = name.toUpperCase();
+                document.getElementById('headerAvatar').src = photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+                document.getElementById('navName').innerText = name.toUpperCase();
+                document.getElementById('navAvatar').src = photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+
+            } catch (error) {
+                console.error(error);
+                msg.className = "status-msg error";
+                msg.innerText = "ERROR: " + error.message;
+                btn.innerText = "UPDATE DOSSIER";
+            }
+        });
+
+        // CHANGE PASSWORD
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('inputPass').value;
+            const confirm = document.getElementById('inputPassConfirm').value;
+            const msg = document.getElementById('passMsg');
+
+            if(pass !== confirm) {
+                msg.className = "status-msg error";
+                msg.innerText = "PASSWORDS DO NOT MATCH";
+                return;
+            }
+
+            try {
+                await updatePassword(currentUser, pass);
+                msg.className = "status-msg success";
+                msg.innerText = "PASSWORD UPDATED. PLEASE RE-LOGIN NEXT TIME.";
+                e.target.reset();
+            } catch (error) {
+                msg.className = "status-msg error";
+                if(error.code === 'auth/requires-recent-login') {
+                    msg.innerText = "SECURITY ALERT: Please Log Out and Log In again to change password.";
+                } else {
+                    msg.innerText = "ERROR: " + error.message;
+                }
+            }
+        });
+
+        // LOGOUT
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.href = "login");
+        });
+    </script>
+</body>
+</html>
