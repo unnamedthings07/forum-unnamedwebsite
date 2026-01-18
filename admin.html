@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Command // Unnamed Things</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES --- */
+        :root { 
+            --color-red: #CD201F; 
+            --color-black: #050505; 
+            --color-dark: #111;
+            --color-border: #333;
+            --font-head: 'Oswald', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'Special Elite', cursive;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--color-black);
+            color: #e0e0e0;
+            font-family: var(--font-body);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: sticky; top: 0; z-index: 1000;
+            background: #000; border-bottom: 2px solid var(--color-red);
+            padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-logo { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--color-red); }
+        .brand-text { font-family: var(--font-mono); font-size: 1.1rem; color: var(--color-red); letter-spacing: 1px; }
+        
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-link { 
+            font-family: var(--font-head); color: #666; text-decoration: none; font-size: 1rem; transition: 0.3s; 
+            text-transform: uppercase; cursor: pointer;
+        }
+        .nav-link.active { color: #fff; border-bottom: 2px solid var(--color-red); }
+        .nav-link:hover { color: var(--color-red); }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .section-title { font-family: var(--font-head); font-size: 2rem; color: #fff; margin-bottom: 2rem; border-left: 5px solid var(--color-red); padding-left: 20px; }
+
+        /* --- DATA TABLES --- */
+        .data-table { width: 100%; border-collapse: collapse; background: #0a0a0a; border: 1px solid #333; }
+        .data-table th { background: #151515; color: var(--color-red); font-family: var(--font-head); padding: 15px; text-align: left; font-weight: normal; letter-spacing: 1px; }
+        .data-table td { padding: 15px; border-bottom: 1px solid #222; font-size: 0.9rem; vertical-align: middle; }
+        .data-table tr:hover { background: #111; }
+
+        /* USER CELLS */
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .user-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #444; }
+        .user-info div { font-weight: bold; color: #fff; }
+        .user-info span { font-size: 0.8rem; color: #666; }
+
+        /* ACTIONS */
+        .btn-action { padding: 5px 10px; border: 1px solid #444; background: transparent; color: #ccc; cursor: pointer; font-family: var(--font-head); font-size: 0.8rem; margin-right: 5px; transition: 0.2s; }
+        .btn-action:hover { background: #fff; color: #000; }
+        .btn-ban { border-color: red; color: red; }
+        .btn-ban:hover { background: red; color: #fff; }
+        
+        .role-select { background: #000; color: #fff; border: 1px solid #333; padding: 5px; font-family: var(--font-mono); font-size: 0.8rem; }
+
+        /* STATUS BADGES */
+        .badge { padding: 3px 8px; font-size: 0.7rem; font-family: var(--font-mono); border: 1px solid; }
+        .badge-active { border-color: green; color: green; }
+        .badge-banned { border-color: red; color: red; }
+
+        .hidden { display: none; }
+        
+        /* ACCESS DENIED SCREEN */
+        #accessDenied { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .denied-text { font-family: var(--font-head); color: red; font-size: 3rem; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="accessDenied">
+        <div class="denied-text">ACCESS DENIED</div>
+        <p style="font-family: 'Special Elite'; color: #666; margin-top: 10px;">RESTRICTED TO ADMINISTRATORS ONLY</p>
+        <a href="index.html" style="color: #fff; margin-top: 20px; font-family: 'Oswald'; border: 1px solid #fff; padding: 10px 20px; text-decoration: none;">RETURN TO TERMINAL</a>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
+                <div class="brand-text">ADMIN COMMAND</div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-link active" onclick="switchTab('users')">PERSONNEL DATABASE</li>
+                <li class="nav-link" onclick="switchTab('reports')">INCIDENT LOGS</li>
+                <li class="nav-link" onclick="window.location.href='index.html'">EXIT</li>
+            </ul>
+        </nav>
+
+        <div class="container">
+            
+            <div id="tabUsers">
+                <h2 class="section-title">REGISTERED AGENTS</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IDENTITY</th>
+                            <th>CLEARANCE LEVEL (ROLE)</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="4" style="text-align:center; padding:30px;">LOADING DATABASE...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="tabReports" class="hidden">
+                <h2 class="section-title">INCIDENT REPORTS</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>TARGET</th>
+                            <th>REASON</th>
+                            <th>DETAILS</th>
+                            <th>REPORTER</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                        <tr><td colspan="5" style="text-align:center; padding:30px;">SCANNING LOGS...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwIMRuv26pcAndpd36EkLbUpSGvh6ptSY",
+            authDomain: "unnamed-things-website-70cf7.firebaseapp.com",
+            projectId: "unnamed-things-website-70cf7",
+            storageBucket: "unnamed-things-website-70cf7.firebasestorage.app",
+            messagingSenderId: "293788800527",
+            appId: "1:293788800527:web:575a1fd1f60d6361f3357a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // *** SECURITY: ADMIN EMAIL LIST ***
+        const ADMIN_EMAILS = ["YOUR_EMAIL@gmail.com"]; 
+
+        // 1. AUTH CHECK
+        onAuthStateChanged(auth, (user) => {
+            if (user && ADMIN_EMAILS.includes(user.email)) {
+                document.getElementById('accessDenied').style.display = 'none';
+                document.getElementById('adminPanel').classList.remove('hidden');
+                loadUsers();
+                loadReports();
+            } else {
+                // Not admin or not logged in -> Stay on Access Denied
+            }
+        });
+
+        // 2. TAB SWITCHING
+        window.switchTab = (tab) => {
+            document.getElementById('tabUsers').classList.add('hidden');
+            document.getElementById('tabReports').classList.add('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            if(tab === 'users') {
+                document.getElementById('tabUsers').classList.remove('hidden');
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('tabReports').classList.remove('hidden');
+                event.target.classList.add('active');
+            }
+        };
+
+        // 3. LOAD USERS
+        async function loadUsers() {
+            const tbody = document.getElementById('userTableBody');
+            const snap = await getDocs(collection(db, "users"));
+            
+            tbody.innerHTML = "";
+            snap.forEach(docSnap => {
+                const u = docSnap.data();
+                const uid = docSnap.id;
+                const isBanned = u.banned === true;
+                
+                // Role Selection Logic
+                const roles = ["Administrator", "Experienced Murderino", "Intermediate Murderino", "Beginner Murderino"];
+                let roleOptions = "";
+                roles.forEach(r => {
+                    const selected = (u.role === r) ? "selected" : "";
+                    roleOptions += `<option value="${r}" ${selected}>${r.toUpperCase()}</option>`;
+                });
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <img src="${u.photo || 'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-img">
+                                <div class="user-info">
+                                    <div>${u.displayName || "UNKNOWN"}</div>
+                                    <span>${u.email || "No Email"}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <select class="role-select" onchange="window.updateUserRole('${uid}', this.value)">
+                                ${roleOptions}
+                            </select>
+                        </td>
+                        <td>
+                            <span class="badge ${isBanned ? 'badge-banned' : 'badge-active'}">
+                                ${isBanned ? 'BANNED' : 'ACTIVE'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-action ${isBanned ? '' : 'btn-ban'}" onclick="window.toggleBan('${uid}', ${isBanned})">
+                                ${isBanned ? 'UNBAN' : 'BAN AGENT'}
+                            </button>
+                            <button class="btn-action" style="border-color:red; color:red;" onclick="window.deleteUser('${uid}')">DELETE</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 4. LOAD REPORTS
+        async function loadReports() {
+            const tbody = document.getElementById('reportTableBody');
+            const snap = await getDocs(collection(db, "reports"));
+            
+            tbody.innerHTML = "";
+            if(snap.empty) {
+                tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#666;'>NO ACTIVE INCIDENTS.</td></tr>";
+                return;
+            }
+
+            snap.forEach(docSnap => {
+                const r = docSnap.data();
+                const rid = docSnap.id;
+                
+                const row = `
+                    <tr>
+                        <td><span style="color:#fff;">${r.type.toUpperCase()}</span> <br> <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span></td>
+                        <td style="color:orange;">${r.reason.toUpperCase()}</td>
+                        <td style="color:#ccc;">${r.details}</td>
+                        <td>${r.reporter}</td>
+                        <td>
+                            <button class="btn-action" onclick="window.dismissReport('${rid}')">RESOLVE</button>
+                            <a href="index.html?t=${r.targetId}" target="_blank" class="btn-action">VIEW</a>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // --- ACTIONS ---
+
+        window.updateUserRole = async (uid, newRole) => {
+            await updateDoc(doc(db, "users", uid), { role: newRole });
+            alert("CLEARANCE LEVEL UPDATED.");
+        };
+
+        window.toggleBan = async (uid, currentStatus) => {
+            if(confirm(currentStatus ? "Restore access for this agent?" : "BAN THIS AGENT? They will lose access.")) {
+                await updateDoc(doc(db, "users", uid), { banned: !currentStatus });
+                loadUsers(); // Refresh
+            }
+        };
+
+        window.deleteUser = async (uid) => {
+            if(confirm("PERMANENTLY DELETE USER? This cannot be undone.")) {
+                await deleteDoc(doc(db, "users", uid));
+                loadUsers();
+            }
+        };
+
+        window.dismissReport = async (rid) => {
+            if(confirm("Mark incident as resolved?")) {
+                await deleteDoc(doc(db, "reports", rid));
+                loadReports();
+            }
+        };
+
+    </script>
+</body>
+</html>

@@ -344,9 +344,22 @@
             }
         ];
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
+            
             if(user) {
+                // 1. CHECK IF BANNED
+                // We fetch the user's profile to see if 'banned' is true
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                
+                if (userSnap.exists() && userSnap.data().banned === true) {
+                    alert("ACCESS DENIED: YOUR ACCOUNT HAS BEEN TERMINATED BY ADMINISTRATOR.");
+                    await signOut(auth);
+                    window.location.reload();
+                    return;
+                }
+
+                // 2. Load UI if not banned
                 document.getElementById('navLoginBtn').style.display = 'none';
                 document.getElementById('navProfile').style.display = 'flex';
                 document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
@@ -578,9 +591,28 @@
         };
 
         function fillPop(uid, data) {
+            // Bio
             document.getElementById(`bio-${uid}`).innerText = data.bio || "No bio available.";
+            
+            // Socials
             if(data.social) {
                 document.getElementById(`social-${uid}`).innerHTML = `SOCIAL: <a href="https://twitter.com/${data.social.replace('@','')}" target="_blank">${data.social}</a>`;
+            } else {
+                document.getElementById(`social-${uid}`).innerHTML = "";
+            }
+
+            // REAL ROLE DISPLAY
+            // If the user has a role saved, use it. Otherwise default to Beginner.
+            const roleContainer = document.querySelector(`#pop-${uid} .pop-role`);
+            if(roleContainer) {
+                if(data.role) {
+                    roleContainer.innerText = data.role.toUpperCase();
+                    // Optional: Color code the Admin
+                    if(data.role === "Administrator") roleContainer.style.color = "var(--color-red)";
+                    else roleContainer.style.color = "#888";
+                } else {
+                    roleContainer.innerText = "BEGINNER MURDERINO";
+                }
             }
         }
 
