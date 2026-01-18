@@ -49,7 +49,7 @@
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
         
         /* USER WIDGET */
-        .user-widget { position: relative; display: flex; align-items: center; gap: 15px; }
+        .user-widget { position: relative; display: flex; align-items: center; }
         .btn-login { 
             background: transparent; border: 1px solid #444; color: #fff; 
             padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
@@ -61,7 +61,7 @@
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #444; }
         .user-name { font-family: var(--font-head); font-size: 0.9rem; color: var(--color-red); }
 
-        /* DROPDOWN */
+        /* NAVBAR DROPDOWN */
         .profile-dropdown {
             display: none; position: absolute; top: 100%; right: 0;
             width: 200px; background: rgba(10, 10, 10, 0.95);
@@ -75,6 +75,7 @@
             width: 100%; background: none; border: none; text-align: left;
             color: #ccc; font-family: var(--font-mono); font-size: 0.9rem;
             padding: 8px 10px; cursor: pointer; transition: color 0.3s;
+            text-decoration: none; display: block;
         }
         .dropdown-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
@@ -104,6 +105,7 @@
         .thread-meta { font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
         .thread-author { color: var(--color-red); }
         
+        /* POSTS */
         .post-container { margin-bottom: 2rem; border: 1px solid #333; background: #0e0e0e; }
         .post-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
         .post-layout { display: flex; }
@@ -117,20 +119,47 @@
         .btn-action { background: var(--color-red); color: #fff; border: none; padding: 10px 25px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
         .btn-action:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
 
+        /* USER HOVER POPUP CARD */
+        .user-hover-trigger { position: relative; cursor: pointer; display: inline-block; }
+        
+        .user-popover {
+            display: none;
+            position: absolute;
+            left: 110%; top: 0; /* Pops out to the right */
+            width: 280px;
+            background: rgba(15, 15, 15, 0.98);
+            border: 1px solid var(--color-red);
+            box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            padding: 1.5rem;
+            z-index: 5000;
+            text-align: left;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.2s ease;
+        }
+        /* Mobile: show below instead */
+        @media (max-width: 768px) {
+            .user-popover { left: 0; top: 100%; }
+        }
+
+        .pop-header { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px; }
+        .pop-avatar { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--color-red); object-fit: cover; }
+        .pop-name { font-family: var(--font-head); font-size: 1.1rem; color: #fff; }
+        .pop-role { font-size: 0.7rem; color: var(--color-red); font-family: var(--font-mono); }
+        .pop-bio { font-size: 0.85rem; color: #aaa; line-height: 1.4; margin-bottom: 10px; font-style: italic; }
+        .pop-social { font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
+        .pop-social a { color: var(--color-red); text-decoration: none; }
+
+        /* REPORT BUTTON */
+        .action-links { display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px; }
+        .btn-report { background: none; border: none; color: #444; font-size: 0.7rem; cursor: pointer; font-family: var(--font-head); }
+        .btn-report:hover { color: red; text-decoration: underline; }
+
+        /* PAGINATION */
         .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; border-top: 1px solid #333; padding-top: 20px; }
         .page-btn { background: #111; border: 1px solid #333; color: #fff; padding: 8px 20px; cursor: pointer; font-family: var(--font-head); transition: 0.3s; }
         .page-btn:hover { border-color: var(--color-red); color: var(--color-red); }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #333; color: #666; }
         .page-info { font-family: var(--font-mono); color: #666; }
-
-        /* ROLES */
-        .user-role-badge { 
-            display: inline-block; padding: 3px 8px; margin-top: 5px; 
-            font-family: var(--font-head); font-size: 0.7rem; letter-spacing: 1px;
-            border: 1px solid #333; color: #888;
-        }
-        .role-admin { border-color: var(--color-red); color: var(--color-red); background: rgba(205,32,31,0.1); }
-        .role-murderino { border-color: #444; color: #aaa; }
 
         /* ADMIN CONTROLS */
         .admin-controls {
@@ -139,23 +168,18 @@
         }
         .btn-admin { background: transparent; border: 1px solid var(--color-red); color: var(--color-red); padding: 5px 15px; cursor: pointer; font-family: var(--font-head); }
         .btn-admin:hover { background: var(--color-red); color: #fff; }
-        
-        .delete-post-btn { color: #666; cursor: pointer; font-size: 0.8rem; margin-left: 10px; border:none; background:none; }
-        .delete-post-btn:hover { color: red; text-decoration: underline; }
+        .locked-banner { background: #111; border: 1px dashed var(--color-red); color: var(--color-red); text-align: center; padding: 20px; font-family: var(--font-head); letter-spacing: 2px; }
 
-        /* LOCKED STATE */
-        .locked-banner {
-            background: #111; border: 1px dashed var(--color-red); color: var(--color-red);
-            text-align: center; padding: 20px; font-family: var(--font-head); letter-spacing: 2px;
-        }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
-        .modal-box { width: 90%; max-width: 600px; background: #111; border: 1px solid var(--color-red); padding: 2rem; }
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 6000; display: none; justify-content: center; align-items: center; }
+        .modal-box { width: 90%; max-width: 600px; background: #111; border: 1px solid var(--color-red); padding: 2rem; position: relative; }
         .form-group { margin-bottom: 1rem; }
         .form-label { display: block; font-family: var(--font-mono); font-size: 0.8rem; color: #888; margin-bottom: 5px; }
         input[type="text"], select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; }
         
         .hidden { display: none; }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:translateY(0);} }
+
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .post-layout { flex-direction: column; }
@@ -174,19 +198,19 @@
 
         <ul class="nav-links">
             <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link"><span>M</span>AIN DATABASE</a></li>
-            <li><a href="connect" class="nav-link"><span>C</span>ONNECT</a></li>
+            <li><a href="connect.html" class="nav-link"><span>C</span>ONNECT</a></li>
         </ul>
 
         <div class="user-widget">
-            <a href="login" id="navLoginBtn" class="btn-login">LOGIN</a>
+            <a href="login.html" id="navLoginBtn" class="btn-login">LOGIN</a>
             
             <div id="navProfile" class="user-profile">
                 <img id="navAvatar" src="" class="user-avatar">
                 <span id="navName" class="user-name">USER</span>
                 <div class="profile-dropdown">
-    <a href="profile" class="dropdown-item" style="color:var(--color-red);">PROFILE SETTINGS</a>
-    <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
-</div>
+                    <a href="profile.html" class="dropdown-item" style="color:var(--color-red);">PROFILE SETTINGS</a>
+                    <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -221,14 +245,12 @@
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
-                    <a href="login" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
+                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
                 </div>
-                
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
                     <button id="btnSubmitReply" class="btn-action">TRANSMIT</button>
                 </div>
-
                 <div id="lockedMessage" class="locked-banner hidden">
                     // THREAD LOCKED BY ADMINISTRATOR //
                 </div>
@@ -245,6 +267,30 @@
             <div style="display:flex; justify-content:flex-end; gap:10px;">
                 <button onclick="document.getElementById('createModal').style.display='none'" style="background:none; border:1px solid #333; color:#fff; padding:10px 20px; cursor:pointer;">CANCEL</button>
                 <button id="btnSubmitThread" class="btn-action">BROADCAST</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportModal" class="modal-overlay">
+        <div class="modal-box" style="border-color:orange;">
+            <h2 style="font-family:'Oswald'; color:orange; margin-bottom:1.5rem;">FILE INCIDENT REPORT</h2>
+            <p style="color:#888; font-size:0.9rem; margin-bottom:1rem;">Submitting false reports may result in account termination.</p>
+            <div class="form-group">
+                <label class="form-label">VIOLATION TYPE</label>
+                <select id="reportReason">
+                    <option value="spam">Spam / Bot Activity</option>
+                    <option value="harassment">Harassment / Hate Speech</option>
+                    <option value="doxxing">Private Info / Doxxing</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">ADDITIONAL DETAILS</label>
+                <textarea id="reportDetails" style="height:100px;" placeholder="Describe the issue..."></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button onclick="document.getElementById('reportModal').style.display='none'" style="background:none; border:1px solid #333; color:#fff; padding:10px 20px; cursor:pointer;">CANCEL</button>
+                <button id="btnSubmitReport" class="btn-action" style="background:orange; color:#000;">SUBMIT REPORT</button>
             </div>
         </div>
     </div>
@@ -269,18 +315,16 @@
         const auth = getAuth(app);
         let currentUser = null;
 
-        // *** SECURITY: SET YOUR ADMIN EMAIL HERE ***
-        const ADMIN_EMAILS = ["unnamedboy07@gmail.com"]; 
+        // *** ADMIN SETUP ***
+        const ADMIN_EMAILS = ["YOUR_EMAIL@gmail.com"]; 
+        function isAdmin() { return currentUser && ADMIN_EMAILS.includes(currentUser.email); }
 
-        function isAdmin() {
-            return currentUser && ADMIN_EMAILS.includes(currentUser.email);
-        }
-
-        // PAGINATION STATE
+        // STATE
         let currentThreadId = null;
         let currentPage = 1;
         const POSTS_PER_PAGE = 15;
-        let pageCursors = {}; 
+        let pageCursors = {};
+        let activeReportTarget = null; // Stores ID of item being reported
 
         const FORUM_DATA = [
             {
@@ -308,7 +352,6 @@
                 document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
                 
-                // Show reply form only if logged in
                 document.getElementById('replyGate').style.display = 'none';
                 document.getElementById('replyForm').style.display = 'block';
             } else {
@@ -317,7 +360,6 @@
                 document.getElementById('replyGate').style.display = 'block';
                 document.getElementById('replyForm').style.display = 'none';
             }
-            // Re-render if looking at a thread (to update buttons)
             if(currentThreadId) renderThread(currentThreadId);
         });
 
@@ -338,8 +380,6 @@
             else renderIndex();
         }
         function navigate(path) { history.pushState({}, '', path); handleRoute(); }
-
-        // --- VIEWS ---
 
         function renderIndex() {
             const c = document.getElementById('viewIndex');
@@ -393,20 +433,20 @@
             const b = findBoardInfo(tData.boardId);
             updateBreadcrumbs([{text: b ? b.title : "...", onclick: `window.navToBoard('${tData.boardId}')`}, {text: tData.title, active: true}]);
             
-            // ADMIN & LOCK LOGIC
+            // ADMIN CONTROLS
             let adminControls = "";
             if(isAdmin()) {
                 adminControls = `
                 <div class="admin-controls">
-                    <span style="font-family:'Oswald'; color:var(--color-red);">// ADMIN OVERRIDE ACTIVE</span>
+                    <span style="font-family:'Oswald'; color:var(--color-red);">// ADMIN OVERRIDE</span>
                     <div>
-                        <button class="btn-admin" onclick="window.toggleLock('${tid}', ${tData.locked})">${tData.locked ? "UNLOCK THREAD" : "LOCK THREAD"}</button>
-                        <button class="btn-admin" style="border-color:red; background:rgba(255,0,0,0.2);" onclick="window.deleteThread('${tid}')">DELETE THREAD</button>
+                        <button class="btn-admin" onclick="window.toggleLock('${tid}', ${tData.locked})">${tData.locked ? "UNLOCK" : "LOCK"}</button>
+                        <button class="btn-admin" style="border-color:red;" onclick="window.deleteThread('${tid}')">DELETE</button>
                     </div>
                 </div>`;
             }
 
-            // Lock UI
+            // LOCK STATE
             const replyForm = document.getElementById('replyForm');
             const lockedMsg = document.getElementById('lockedMessage');
             if(tData.locked) {
@@ -417,10 +457,11 @@
                 lockedMsg.classList.add('hidden');
             }
 
+            // RENDER OP
             c.innerHTML = `
                 ${adminControls}
                 <h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
-                ${buildPostHTML(tData, true)}
+                ${buildPostHTML(tData, true, tid)}
                 <div id="replies-container"></div>`;
             
             loadPosts(1);
@@ -457,48 +498,122 @@
         document.getElementById('btnPrevPage').addEventListener('click', () => { if (currentPage > 1) loadPosts(currentPage - 1); });
         document.getElementById('btnNextPage').addEventListener('click', () => { loadPosts(currentPage + 1); });
 
-        // --- HTML BUILDER (WITH ROLES) ---
-        function buildPostHTML(d, isOP, postId) {
+        // --- HTML BUILDER (WITH HOVER & REPORT) ---
+        function buildPostHTML(d, isOP, docId) {
             const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : "---";
             const color = isOP ? "var(--color-red)" : "#666";
             
-            // ROLE LOGIC
-            let roleBadge = `<span class="user-role-badge role-murderino">BEGINNER MURDERINO</span>`;
-            
-            // 1. Check if Admin (Based on Email)
-            // Note: In a real app, this should check the DB, but for this static setup, we check the stored author email if available, or just name
-            // Simplified: If the author's name matches the current logged in admin, show admin. (Weak check, but best for now)
-            
-            // Better check: If we stored the email in the post (we didn't yet), we could check. 
-            // Since we can't retrofit old posts, we will check if the NAME matches "unnamedthings07" or specific names.
-            if(d.authorEmail && ADMIN_EMAILS.includes(d.authorEmail)) {
-                roleBadge = `<span class="user-role-badge role-admin">ADMINISTRATOR</span>`;
-            } else if (d.author === "Unnamed Things" || d.author === "Admin") {
-                 roleBadge = `<span class="user-role-badge role-admin">ADMINISTRATOR</span>`;
-            }
+            let roleBadge = "";
+            if(d.authorEmail && ADMIN_EMAILS.includes(d.authorEmail)) roleBadge = `<span style="font-size:0.7rem; color:red; border:1px solid red; padding:2px 5px;">ADMIN</span>`;
 
-            // ADMIN DELETE BUTTON
+            // DELETE BUTTON (Admin Only)
             let deleteBtn = "";
             if(isAdmin() && !isOP) {
-                deleteBtn = `<button class="delete-post-btn" onclick="window.deletePost('${postId}')">[DELETE]</button>`;
+                deleteBtn = `<button class="btn-report" onclick="window.deletePost('${docId}')" style="color:red;">[DELETE]</button>`;
             }
+
+            // REPORT BUTTON (Everyone)
+            let reportBtn = `<button class="btn-report" onclick="window.openReportModal('${docId}', '${isOP ? 'THREAD' : 'POST'}')">[REPORT]</button>`;
 
             return `
             <div class="post-container">
                 <div class="post-header">
                     <span>${date}</span>
-                    <span>${isOP ? '#1' : 'REPLY'} ${deleteBtn}</span>
+                    <div class="action-links">
+                        ${deleteBtn}
+                        ${reportBtn}
+                        <span>${isOP ? '#1' : 'REPLY'}</span>
+                    </div>
                 </div>
                 <div class="post-layout">
                     <div class="post-user-col">
-                        <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
-                        <div style="font-family:'Oswald'; color:${color};">${d.author}</div>
-                        ${roleBadge}
+                        <div class="user-hover-trigger" onmouseenter="window.showUserCard(event, '${d.uid}')" onmouseleave="window.hideUserCard()">
+                            <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
+                            <div style="font-family:'Oswald'; color:${color}; margin-top:10px;">${d.author}</div>
+                            ${roleBadge}
+                            
+                            <div class="user-popover" id="pop-${d.uid}">
+                                <div class="pop-header">
+                                    <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="pop-avatar">
+                                    <div>
+                                        <div class="pop-name">${d.author}</div>
+                                        <div class="pop-role">${roleBadge ? "ADMINISTRATOR" : "ESTABLISHED MURDERINO"}</div>
+                                    </div>
+                                </div>
+                                <div class="pop-bio" id="bio-${d.uid}">Loading bio...</div>
+                                <div class="pop-social" id="social-${d.uid}"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="post-content-col">${d.body.replace(/\n/g, '<br>')}</div>
                 </div>
             </div>`;
         }
+
+        // --- HOVER CARD LOGIC ---
+        let fetchCache = {}; // Cache user data to avoid spamming DB
+
+        window.showUserCard = async (e, uid) => {
+            const pop = document.getElementById(`pop-${uid}`);
+            if(!pop) return;
+            pop.style.display = 'block';
+
+            // Check Cache first
+            if(fetchCache[uid]) {
+                fillPop(uid, fetchCache[uid]);
+                return;
+            }
+
+            // Fetch from DB
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    fetchCache[uid] = data;
+                    fillPop(uid, data);
+                } else {
+                    document.getElementById(`bio-${uid}`).innerText = "No dossier found.";
+                }
+            } catch(err) { console.log("Profile fetch error"); }
+        };
+
+        function fillPop(uid, data) {
+            document.getElementById(`bio-${uid}`).innerText = data.bio || "No bio available.";
+            if(data.social) {
+                document.getElementById(`social-${uid}`).innerHTML = `SOCIAL: <a href="https://twitter.com/${data.social.replace('@','')}" target="_blank">${data.social}</a>`;
+            }
+        }
+
+        window.hideUserCard = () => {
+            document.querySelectorAll('.user-popover').forEach(el => el.style.display = 'none');
+        };
+
+        // --- REPORTING LOGIC ---
+        window.openReportModal = (id, type) => {
+            if(!currentUser) return alert("LOGIN REQUIRED TO REPORT");
+            activeReportTarget = { id, type };
+            document.getElementById('reportModal').style.display = 'flex';
+        };
+
+        document.getElementById('btnSubmitReport').addEventListener('click', async () => {
+            const reason = document.getElementById('reportReason').value;
+            const details = document.getElementById('reportDetails').value;
+            
+            if(activeReportTarget) {
+                await addDoc(collection(db, "reports"), {
+                    targetId: activeReportTarget.id,
+                    type: activeReportTarget.type,
+                    reason: reason,
+                    details: details,
+                    reporter: currentUser.email,
+                    timestamp: serverTimestamp(),
+                    status: "PENDING"
+                });
+                alert("REPORT FILED. ADMINISTRATORS WILL REVIEW.");
+                document.getElementById('reportModal').style.display = 'none';
+                document.getElementById('reportDetails').value = "";
+            }
+        });
 
         // --- GLOBAL ACTIONS ---
         window.navToIndex = () => navigate('/');
@@ -507,26 +622,20 @@
         
         window.toggleLock = async (tid, currentStatus) => {
             if(!isAdmin()) return;
-            if(confirm(currentStatus ? "Unlock this thread?" : "Lock this thread?")) {
+            if(confirm("Toggle Lock?")) {
                 await updateDoc(doc(db, "threads", tid), { locked: !currentStatus });
-                renderThread(tid); // Refresh
+                renderThread(tid);
             }
         };
 
         window.deleteThread = async (tid) => {
             if(!isAdmin()) return;
-            if(confirm("PERMANENTLY DELETE THREAD? THIS CANNOT BE UNDONE.")) {
-                await deleteDoc(doc(db, "threads", tid));
-                navigate('/');
-            }
+            if(confirm("DELETE THREAD?")) { await deleteDoc(doc(db, "threads", tid)); navigate('/'); }
         };
 
         window.deletePost = async (pid) => {
             if(!isAdmin()) return;
-            if(confirm("Delete this reply?")) {
-                await deleteDoc(doc(db, "posts", pid));
-                loadPosts(currentPage); // Refresh page
-            }
+            if(confirm("Delete Post?")) { await deleteDoc(doc(db, "posts", pid)); loadPosts(currentPage); }
         };
 
         window.openCreateModal = () => {
@@ -546,12 +655,10 @@
             const body = document.getElementById('newThreadBody').value;
             if(!title || !body) return alert("MISSING FIELDS");
             
-            // Save email so we can verify admin status on posts
             const ref = await addDoc(collection(db, "threads"), {
                 boardId: bid, title: title, body: body, author: currentUser.displayName || "USER",
                 authorEmail: currentUser.email,
-                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp(),
-                locked: false
+                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp(), locked: false
             });
             document.getElementById('createModal').style.display = 'none';
             document.getElementById('newThreadTitle').value = ""; document.getElementById('newThreadBody').value = "";
