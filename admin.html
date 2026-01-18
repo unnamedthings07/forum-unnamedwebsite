@@ -75,6 +75,9 @@
         .badge-active { border-color: green; color: green; }
         .badge-banned { border-color: red; color: red; }
 
+        .target-link { color: #fff; text-decoration: none; border-bottom: 1px dashed #666; }
+        .target-link:hover { color: var(--color-red); border-color: var(--color-red); }
+
         .hidden { display: none; }
         
         /* ACCESS DENIED SCREEN */
@@ -162,8 +165,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // *** SECURITY: ADMIN EMAIL LIST ***
-        const ADMIN_EMAILS = ["unnamedboy07@gmail.com"]; 
+        // *** SECURITY: SET YOUR ADMIN EMAIL HERE ***
+        const ADMIN_EMAILS = ["YOUR_EMAIL@gmail.com"]; 
 
         // 1. AUTH CHECK
         onAuthStateChanged(auth, (user) => {
@@ -172,8 +175,6 @@
                 document.getElementById('adminPanel').classList.remove('hidden');
                 loadUsers();
                 loadReports();
-            } else {
-                // Not admin or not logged in -> Stay on Access Denied
             }
         });
 
@@ -192,7 +193,7 @@
             }
         };
 
-        // 3. LOAD USERS
+        // 3. LOAD USERS (Corrected to show data)
         async function loadUsers() {
             const tbody = document.getElementById('userTableBody');
             const snap = await getDocs(collection(db, "users"));
@@ -203,7 +204,11 @@
                 const uid = docSnap.id;
                 const isBanned = u.banned === true;
                 
-                // Role Selection Logic
+                // DATA FALLBACKS: This relies on login.html/profile.html syncing data properly
+                const displayName = u.displayName || "Unknown Agent";
+                const displayEmail = u.email || "No Email Data";
+                const displayPhoto = u.photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+
                 const roles = ["Administrator", "Experienced Murderino", "Intermediate Murderino", "Beginner Murderino"];
                 let roleOptions = "";
                 roles.forEach(r => {
@@ -215,10 +220,10 @@
                     <tr>
                         <td>
                             <div class="user-cell">
-                                <img src="${u.photo || 'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-img">
+                                <img src="${displayPhoto}" class="user-img">
                                 <div class="user-info">
-                                    <div>${u.displayName || "UNKNOWN"}</div>
-                                    <span>${u.email || "No Email"}</span>
+                                    <div>${displayName.toUpperCase()}</div>
+                                    <span>${displayEmail}</span>
                                 </div>
                             </div>
                         </td>
@@ -244,7 +249,7 @@
             });
         }
 
-        // 4. LOAD REPORTS
+        // 4. LOAD REPORTS (With Clickable Links)
         async function loadReports() {
             const tbody = document.getElementById('reportTableBody');
             const snap = await getDocs(collection(db, "reports"));
@@ -259,15 +264,27 @@
                 const r = docSnap.data();
                 const rid = docSnap.id;
                 
+                // Generate Clickable Link if threadId exists
+                let targetDisplay = `<span style="color:#fff;">${r.type.toUpperCase()}</span> <br> <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span>`;
+                
+                if (r.threadId) {
+                    targetDisplay = `
+                        <a href="index.html?t=${r.threadId}" target="_blank" class="target-link">
+                            ${r.type.toUpperCase()} &rarr; VIEW
+                        </a>
+                        <br>
+                        <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span>
+                    `;
+                }
+
                 const row = `
                     <tr>
-                        <td><span style="color:#fff;">${r.type.toUpperCase()}</span> <br> <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span></td>
+                        <td>${targetDisplay}</td>
                         <td style="color:orange;">${r.reason.toUpperCase()}</td>
                         <td style="color:#ccc;">${r.details}</td>
                         <td>${r.reporter}</td>
                         <td>
                             <button class="btn-action" onclick="window.dismissReport('${rid}')">RESOLVE</button>
-                            <a href="index.html?t=${r.targetId}" target="_blank" class="btn-action">VIEW</a>
                         </td>
                     </tr>
                 `;
@@ -276,21 +293,20 @@
         }
 
         // --- ACTIONS ---
-
         window.updateUserRole = async (uid, newRole) => {
             await updateDoc(doc(db, "users", uid), { role: newRole });
             alert("CLEARANCE LEVEL UPDATED.");
         };
 
         window.toggleBan = async (uid, currentStatus) => {
-            if(confirm(currentStatus ? "Restore access for this agent?" : "BAN THIS AGENT? They will lose access.")) {
+            if(confirm(currentStatus ? "Restore access?" : "BAN THIS AGENT?")) {
                 await updateDoc(doc(db, "users", uid), { banned: !currentStatus });
-                loadUsers(); // Refresh
+                loadUsers();
             }
         };
 
         window.deleteUser = async (uid) => {
-            if(confirm("PERMANENTLY DELETE USER? This cannot be undone.")) {
+            if(confirm("PERMANENTLY DELETE USER?")) {
                 await deleteDoc(doc(db, "users", uid));
                 loadUsers();
             }
@@ -302,7 +318,6 @@
                 loadReports();
             }
         };
-
     </script>
 </body>
 </html>

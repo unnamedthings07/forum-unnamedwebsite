@@ -374,6 +374,12 @@
                 document.getElementById('replyForm').style.display = 'none';
             }
             if(currentThreadId) renderThread(currentThreadId);
+            await setDoc(doc(db, "users", user.uid), {
+        displayName: user.displayName || "Unknown",
+        email: user.email,
+        photo: user.photoURL,
+        lastActive: serverTimestamp()
+    }, { merge: true });
         });
 
         document.getElementById('navLogoutBtn').addEventListener('click', () => {
@@ -623,7 +629,8 @@
         // --- REPORTING LOGIC ---
         window.openReportModal = (id, type) => {
             if(!currentUser) return alert("LOGIN REQUIRED TO REPORT");
-            activeReportTarget = { id, type };
+            // Pass the currentThreadId so the admin knows where to look
+            activeReportTarget = { id, type, threadId: currentThreadId };
             document.getElementById('reportModal').style.display = 'flex';
         };
 
