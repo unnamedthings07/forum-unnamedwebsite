@@ -270,10 +270,13 @@
 
                 // 2. Update Firestore (Extended Info)
                 await setDoc(doc(db, "users", currentUser.uid), {
-                    bio: bio,
-                    social: social,
-                    updatedAt: new Date()
-                }, { merge: true });
+    displayName: name, // Save name to DB
+    email: currentUser.email, // Save email to DB
+    photo: photo, // Save photo to DB
+    bio: bio,
+    social: social,
+    updatedAt: new Date()
+}, { merge: true });
 
                 msg.className = "status-msg success";
                 msg.innerText = "PROFILE UPDATED SUCCESSFULLY";
@@ -291,6 +294,7 @@
                 msg.innerText = "ERROR: " + error.message;
                 btn.innerText = "UPDATE DOSSIER";
             }
+            
         });
 
         // CHANGE PASSWORD
