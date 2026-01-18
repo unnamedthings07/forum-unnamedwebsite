@@ -49,7 +49,7 @@
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
         
         /* USER WIDGET */
-        .user-widget { position: relative; display: flex; align-items: center; }
+        .user-widget { position: relative; display: flex; align-items: center; gap: 15px; }
         .btn-login { 
             background: transparent; border: 1px solid #444; color: #fff; 
             padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
@@ -85,7 +85,7 @@
         .crumb-link:hover { color: var(--color-red); }
         .crumb-active { color: #fff; }
 
-        /* --- FORUM STYLES --- */
+        /* --- FORUM --- */
         .category-block { margin-bottom: 2rem; border: 1px solid var(--color-border); background: #0a0a0a; }
         .cat-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border); }
         .cat-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--color-red); letter-spacing: 1px; }
@@ -98,14 +98,12 @@
         .board-desc { font-size: 0.9rem; color: #888; }
         .board-stats { display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 0.8rem; color: #555; }
 
-        /* THREADS */
         .thread-row { background: #111; border: 1px solid #333; padding: 1.5rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
         .thread-row:hover { border-color: var(--color-red); transform: translateX(5px); }
         .thread-main h4 { font-family: var(--font-head); font-size: 1.1rem; margin-bottom: 5px; color: #fff; }
         .thread-meta { font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
         .thread-author { color: var(--color-red); }
         
-        /* POSTS */
         .post-container { margin-bottom: 2rem; border: 1px solid #333; background: #0e0e0e; }
         .post-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
         .post-layout { display: flex; }
@@ -116,18 +114,41 @@
         textarea { width: 100%; background: #080808; border: 1px solid #333; color: #fff; padding: 15px; font-family: var(--font-body); min-height: 120px; margin-bottom: 1rem; }
         textarea:focus { border-color: var(--color-red); outline: none; }
 
-        /* BUTTONS */
         .btn-action { background: var(--color-red); color: #fff; border: none; padding: 10px 25px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
         .btn-action:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
 
-        /* PAGINATION CONTROLS */
         .pagination-bar { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; border-top: 1px solid #333; padding-top: 20px; }
         .page-btn { background: #111; border: 1px solid #333; color: #fff; padding: 8px 20px; cursor: pointer; font-family: var(--font-head); transition: 0.3s; }
         .page-btn:hover { border-color: var(--color-red); color: var(--color-red); }
         .page-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #333; color: #666; }
         .page-info { font-family: var(--font-mono); color: #666; }
 
-        /* MODAL */
+        /* ROLES */
+        .user-role-badge { 
+            display: inline-block; padding: 3px 8px; margin-top: 5px; 
+            font-family: var(--font-head); font-size: 0.7rem; letter-spacing: 1px;
+            border: 1px solid #333; color: #888;
+        }
+        .role-admin { border-color: var(--color-red); color: var(--color-red); background: rgba(205,32,31,0.1); }
+        .role-murderino { border-color: #444; color: #aaa; }
+
+        /* ADMIN CONTROLS */
+        .admin-controls {
+            background: rgba(205,32,31,0.1); border: 1px solid var(--color-red);
+            padding: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-admin { background: transparent; border: 1px solid var(--color-red); color: var(--color-red); padding: 5px 15px; cursor: pointer; font-family: var(--font-head); }
+        .btn-admin:hover { background: var(--color-red); color: #fff; }
+        
+        .delete-post-btn { color: #666; cursor: pointer; font-size: 0.8rem; margin-left: 10px; border:none; background:none; }
+        .delete-post-btn:hover { color: red; text-decoration: underline; }
+
+        /* LOCKED STATE */
+        .locked-banner {
+            background: #111; border: 1px dashed var(--color-red); color: var(--color-red);
+            text-align: center; padding: 20px; font-family: var(--font-head); letter-spacing: 2px;
+        }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .modal-box { width: 90%; max-width: 600px; background: #111; border: 1px solid var(--color-red); padding: 2rem; }
         .form-group { margin-bottom: 1rem; }
@@ -135,7 +156,6 @@
         input[type="text"], select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; }
         
         .hidden { display: none; }
-        
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .post-layout { flex-direction: column; }
@@ -202,9 +222,14 @@
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
                     <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
                 </div>
+                
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
                     <button id="btnSubmitReply" class="btn-action">TRANSMIT</button>
+                </div>
+
+                <div id="lockedMessage" class="locked-banner hidden">
+                    // THREAD LOCKED BY ADMINISTRATOR //
                 </div>
             </div>
         </div>
@@ -225,9 +250,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, onSnapshot, limit, startAfter, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDoc, getDocs, deleteDoc, updateDoc, doc, query, where, orderBy, onSnapshot, limit, startAfter, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+        // --- CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDwIMRuv26pcAndpd36EkLbUpSGvh6ptSY",
             authDomain: "unnamed-things-website-70cf7.firebaseapp.com",
@@ -242,11 +268,18 @@
         const auth = getAuth(app);
         let currentUser = null;
 
+        // *** SECURITY: SET YOUR ADMIN EMAIL HERE ***
+        const ADMIN_EMAILS = ["YOUR_EMAIL@gmail.com"]; 
+
+        function isAdmin() {
+            return currentUser && ADMIN_EMAILS.includes(currentUser.email);
+        }
+
         // PAGINATION STATE
         let currentThreadId = null;
         let currentPage = 1;
         const POSTS_PER_PAGE = 15;
-        let pageCursors = {}; // Stores last doc of each page to start next one
+        let pageCursors = {}; 
 
         const FORUM_DATA = [
             {
@@ -273,6 +306,8 @@
                 document.getElementById('navProfile').style.display = 'flex';
                 document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
+                
+                // Show reply form only if logged in
                 document.getElementById('replyGate').style.display = 'none';
                 document.getElementById('replyForm').style.display = 'block';
             } else {
@@ -281,6 +316,8 @@
                 document.getElementById('replyGate').style.display = 'block';
                 document.getElementById('replyForm').style.display = 'none';
             }
+            // Re-render if looking at a thread (to update buttons)
+            if(currentThreadId) renderThread(currentThreadId);
         });
 
         document.getElementById('navLogoutBtn').addEventListener('click', () => {
@@ -300,6 +337,8 @@
             else renderIndex();
         }
         function navigate(path) { history.pushState({}, '', path); handleRoute(); }
+
+        // --- VIEWS ---
 
         function renderIndex() {
             const c = document.getElementById('viewIndex');
@@ -324,7 +363,6 @@
             updateBreadcrumbs([{text: b.title, active: true}]);
             const list = document.getElementById('threadListContainer');
             list.innerHTML = "<div style='padding:20px; color:#666;'>Scanning...</div>";
-            
             const q = query(collection(db, "threads"), where("boardId", "==", bid), orderBy("timestamp", "desc"));
             onSnapshot(q, (s) => {
                 list.innerHTML = "";
@@ -339,30 +377,51 @@
             });
         }
 
-        // --- NEW THREAD PAGINATION LOGIC ---
         async function renderThread(tid) {
             currentThreadId = tid;
             currentPage = 1;
-            pageCursors = {}; // Reset state
+            pageCursors = {}; 
             
             document.getElementById('viewThread').classList.remove('hidden');
             const c = document.getElementById('threadContent');
             c.innerHTML = "Loading...";
             
-            // 1. Fetch OP
             const snap = await getDoc(doc(db, "threads", tid));
             if(!snap.exists()) return navigate('/');
             const tData = snap.data();
-            
             const b = findBoardInfo(tData.boardId);
             updateBreadcrumbs([{text: b ? b.title : "...", onclick: `window.navToBoard('${tData.boardId}')`}, {text: tData.title, active: true}]);
             
-            // 2. Render Header (OP)
-            c.innerHTML = `<h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
-            ${buildPostHTML(tData, true)}
-            <div id="replies-container"></div>`;
+            // ADMIN & LOCK LOGIC
+            let adminControls = "";
+            if(isAdmin()) {
+                adminControls = `
+                <div class="admin-controls">
+                    <span style="font-family:'Oswald'; color:var(--color-red);">// ADMIN OVERRIDE ACTIVE</span>
+                    <div>
+                        <button class="btn-admin" onclick="window.toggleLock('${tid}', ${tData.locked})">${tData.locked ? "UNLOCK THREAD" : "LOCK THREAD"}</button>
+                        <button class="btn-admin" style="border-color:red; background:rgba(255,0,0,0.2);" onclick="window.deleteThread('${tid}')">DELETE THREAD</button>
+                    </div>
+                </div>`;
+            }
+
+            // Lock UI
+            const replyForm = document.getElementById('replyForm');
+            const lockedMsg = document.getElementById('lockedMessage');
+            if(tData.locked) {
+                replyForm.classList.add('hidden');
+                lockedMsg.classList.remove('hidden');
+            } else {
+                if(currentUser) replyForm.classList.remove('hidden');
+                lockedMsg.classList.add('hidden');
+            }
+
+            c.innerHTML = `
+                ${adminControls}
+                <h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
+                ${buildPostHTML(tData, true)}
+                <div id="replies-container"></div>`;
             
-            // 3. Load First Page
             loadPosts(1);
         }
 
@@ -374,73 +433,101 @@
             
             container.innerHTML = "<div style='color:#666; padding:20px;'>Loading segment...</div>";
             
-            // Build Query
-            let q = query(
-                collection(db, "posts"), 
-                where("threadId", "==", currentThreadId), 
-                orderBy("timestamp", "asc"), 
-                limit(POSTS_PER_PAGE)
-            );
-
-            // If page > 1, start after previous page's last doc
+            let q = query(collection(db, "posts"), where("threadId", "==", currentThreadId), orderBy("timestamp", "asc"), limit(POSTS_PER_PAGE));
             if (page > 1 && pageCursors[page - 1]) {
-                q = query(
-                    collection(db, "posts"), 
-                    where("threadId", "==", currentThreadId), 
-                    orderBy("timestamp", "asc"), 
-                    startAfter(pageCursors[page - 1]),
-                    limit(POSTS_PER_PAGE)
-                );
+                q = query(collection(db, "posts"), where("threadId", "==", currentThreadId), orderBy("timestamp", "asc"), startAfter(pageCursors[page - 1]), limit(POSTS_PER_PAGE));
             }
 
             const snapshot = await getDocs(q);
             container.innerHTML = "";
             
-            snapshot.forEach(doc => {
-                container.innerHTML += buildPostHTML(doc.data(), false);
+            snapshot.forEach(d => {
+                container.innerHTML += buildPostHTML(d.data(), false, d.id);
             });
 
-            // Store last doc for next page
-            if (!snapshot.empty) {
-                const lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                pageCursors[page] = lastVisible;
-            }
+            if (!snapshot.empty) pageCursors[page] = snapshot.docs[snapshot.docs.length - 1];
 
-            // Update Controls
             currentPage = page;
             pageInd.innerText = `PAGE ${currentPage}`;
             btnPrev.disabled = (currentPage === 1);
-            // Disable Next if we fetched fewer than limit (end of list)
             btnNext.disabled = (snapshot.docs.length < POSTS_PER_PAGE);
         }
 
-        // Pagination Buttons
-        document.getElementById('btnPrevPage').addEventListener('click', () => {
-            if (currentPage > 1) loadPosts(currentPage - 1);
-        });
-        document.getElementById('btnNextPage').addEventListener('click', () => {
-            loadPosts(currentPage + 1);
-        });
+        document.getElementById('btnPrevPage').addEventListener('click', () => { if (currentPage > 1) loadPosts(currentPage - 1); });
+        document.getElementById('btnNextPage').addEventListener('click', () => { loadPosts(currentPage + 1); });
 
-        function buildPostHTML(d, isOP) {
+        // --- HTML BUILDER (WITH ROLES) ---
+        function buildPostHTML(d, isOP, postId) {
             const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : "---";
             const color = isOP ? "var(--color-red)" : "#666";
             
-            return `<div class="post-container"><div class="post-header"><span>${date}</span><span>${isOP ? '#1' : 'REPLY'}</span></div>
-            <div class="post-layout"><div class="post-user-col"><img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
-            <div style="font-family:'Oswald'; color:${color};">${d.author}</div></div>
-            <div class="post-content-col">${d.body.replace(/\n/g, '<br>')}</div></div></div>`;
+            // ROLE LOGIC
+            let roleBadge = `<span class="user-role-badge role-murderino">BEGINNER MURDERINO</span>`;
+            
+            // 1. Check if Admin (Based on Email)
+            // Note: In a real app, this should check the DB, but for this static setup, we check the stored author email if available, or just name
+            // Simplified: If the author's name matches the current logged in admin, show admin. (Weak check, but best for now)
+            
+            // Better check: If we stored the email in the post (we didn't yet), we could check. 
+            // Since we can't retrofit old posts, we will check if the NAME matches "unnamedthings07" or specific names.
+            if(d.authorEmail && ADMIN_EMAILS.includes(d.authorEmail)) {
+                roleBadge = `<span class="user-role-badge role-admin">ADMINISTRATOR</span>`;
+            } else if (d.author === "Unnamed Things" || d.author === "Admin") {
+                 roleBadge = `<span class="user-role-badge role-admin">ADMINISTRATOR</span>`;
+            }
+
+            // ADMIN DELETE BUTTON
+            let deleteBtn = "";
+            if(isAdmin() && !isOP) {
+                deleteBtn = `<button class="delete-post-btn" onclick="window.deletePost('${postId}')">[DELETE]</button>`;
+            }
+
+            return `
+            <div class="post-container">
+                <div class="post-header">
+                    <span>${date}</span>
+                    <span>${isOP ? '#1' : 'REPLY'} ${deleteBtn}</span>
+                </div>
+                <div class="post-layout">
+                    <div class="post-user-col">
+                        <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
+                        <div style="font-family:'Oswald'; color:${color};">${d.author}</div>
+                        ${roleBadge}
+                    </div>
+                    <div class="post-content-col">${d.body.replace(/\n/g, '<br>')}</div>
+                </div>
+            </div>`;
         }
 
-        function findBoardInfo(id) { for(let c of FORUM_DATA) { const b = c.boards.find(x => x.id === id); if(b) return b; } return null; }
-        function updateBreadcrumbs(items) {
-            const bc = document.getElementById('breadcrumbs'); bc.innerHTML = `<a href="javascript:void(0)" onclick="window.navToIndex()" class="crumb-link">INDEX</a>`;
-            items.forEach(i => bc.innerHTML += ` <span>/</span> ${i.active ? `<span class="crumb-active">${i.text}</span>` : `<a href="javascript:void(0)" onclick="${i.onclick}" class="crumb-link">${i.text}</a>`}`);
-        }
-
+        // --- GLOBAL ACTIONS ---
         window.navToIndex = () => navigate('/');
         window.navToBoard = (id) => navigate(`?b=${id}`);
         window.navToThread = (id) => navigate(`?t=${id}`);
+        
+        window.toggleLock = async (tid, currentStatus) => {
+            if(!isAdmin()) return;
+            if(confirm(currentStatus ? "Unlock this thread?" : "Lock this thread?")) {
+                await updateDoc(doc(db, "threads", tid), { locked: !currentStatus });
+                renderThread(tid); // Refresh
+            }
+        };
+
+        window.deleteThread = async (tid) => {
+            if(!isAdmin()) return;
+            if(confirm("PERMANENTLY DELETE THREAD? THIS CANNOT BE UNDONE.")) {
+                await deleteDoc(doc(db, "threads", tid));
+                navigate('/');
+            }
+        };
+
+        window.deletePost = async (pid) => {
+            if(!isAdmin()) return;
+            if(confirm("Delete this reply?")) {
+                await deleteDoc(doc(db, "posts", pid));
+                loadPosts(currentPage); // Refresh page
+            }
+        };
+
         window.openCreateModal = () => {
             if(!currentUser) return alert("LOGIN REQUIRED");
             const sel = document.getElementById('newThreadBoard'); sel.innerHTML = "";
@@ -449,8 +536,6 @@
                 c.boards.forEach(b => { let opt = document.createElement('option'); opt.value = b.id; opt.innerText = b.title; grp.appendChild(opt); });
                 sel.appendChild(grp);
             });
-            const params = new URLSearchParams(window.location.search);
-            if(params.get('b')) sel.value = params.get('b');
             document.getElementById('createModal').style.display = 'flex';
         };
 
@@ -459,9 +544,13 @@
             const title = document.getElementById('newThreadTitle').value;
             const body = document.getElementById('newThreadBody').value;
             if(!title || !body) return alert("MISSING FIELDS");
+            
+            // Save email so we can verify admin status on posts
             const ref = await addDoc(collection(db, "threads"), {
                 boardId: bid, title: title, body: body, author: currentUser.displayName || "USER",
-                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
+                authorEmail: currentUser.email,
+                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp(),
+                locked: false
             });
             document.getElementById('createModal').style.display = 'none';
             document.getElementById('newThreadTitle').value = ""; document.getElementById('newThreadBody').value = "";
@@ -471,13 +560,19 @@
         document.getElementById('btnSubmitReply').addEventListener('click', async () => {
             const body = document.getElementById('replyInput').value; if(!body) return;
             await addDoc(collection(db, "posts"), {
-                threadId: activeThreadId, body: body, author: currentUser.displayName || "USER",
+                threadId: currentThreadId, body: body, author: currentUser.displayName || "USER",
+                authorEmail: currentUser.email,
                 uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
             document.getElementById('replyInput').value = "";
-            // Reload current page to see new post
             loadPosts(currentPage);
         });
+
+        function findBoardInfo(id) { for(let c of FORUM_DATA) { const b = c.boards.find(x => x.id === id); if(b) return b; } return null; }
+        function updateBreadcrumbs(items) {
+            const bc = document.getElementById('breadcrumbs'); bc.innerHTML = `<a href="javascript:void(0)" onclick="window.navToIndex()" class="crumb-link">INDEX</a>`;
+            items.forEach(i => bc.innerHTML += ` <span>/</span> ${i.active ? `<span class="crumb-active">${i.text}</span>` : `<a href="javascript:void(0)" onclick="${i.onclick}" class="crumb-link">${i.text}</a>`}`);
+        }
 
         handleRoute();
     </script>
