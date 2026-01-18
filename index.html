@@ -11,8 +11,10 @@
         /* --- CORE VARIABLES --- */
         :root { 
             --color-red: #CD201F; 
+            --color-red-dim: #8a1515;
             --color-black: #050505; 
             --color-dark: #111;
+            --color-border: #333;
             --font-head: 'Oswald', sans-serif;
             --font-body: 'Roboto', sans-serif;
             --font-mono: 'Special Elite', cursive;
@@ -34,7 +36,6 @@
             padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center;
             backdrop-filter: blur(10px);
         }
-        /* BRAND LINK -> Points to FORUM ROOT */
         .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .nav-logo { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--color-red); }
         .brand-text { font-family: var(--font-mono); font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
@@ -48,7 +49,7 @@
         .nav-link span { color: var(--color-red); }
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
         
-        /* --- USER WIDGET (HOVER POPUP) --- */
+        /* --- USER WIDGET --- */
         .user-widget { position: relative; display: flex; align-items: center; }
         
         .btn-login { 
@@ -71,11 +72,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             padding: 10px; z-index: 2000; margin-top: 5px;
         }
-        /* INVISIBLE BRIDGE (Fixes the disappearing issue) */
         .profile-dropdown::before {
             content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px;
         }
-        /* SHOW ON HOVER */
         .user-profile:hover .profile-dropdown, .profile-dropdown:hover { display: block; }
 
         .dropdown-item {
@@ -85,14 +84,14 @@
         }
         .dropdown-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- LAYOUT --- */
         .container { max-width: 1100px; margin: 0 auto; padding: 2rem 20px; }
         .breadcrumbs { margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.8rem; color: #666; display: flex; gap: 10px; align-items: center; }
         .crumb-link { color: #888; text-decoration: none; cursor: pointer; }
         .crumb-link:hover { color: var(--color-red); }
         .crumb-active { color: #fff; }
 
-        /* --- FORUM STYLES --- */
+        /* --- FORUM INDEX --- */
         .category-block { margin-bottom: 2rem; border: 1px solid var(--color-border); background: #0a0a0a; }
         .cat-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border); }
         .cat-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--color-red); letter-spacing: 1px; }
@@ -137,7 +136,7 @@
         .hidden { display: none; }
         
         @media (max-width: 768px) {
-            .nav-links { display: none; } /* Hide extra links on mobile for simplicity */
+            .nav-links { display: none; }
             .post-layout { flex-direction: column; }
             .post-user-col { width: 100%; border-right: none; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 15px; padding: 10px; text-align: left; }
             .user-avatar-large { width: 40px; height: 40px; margin: 0; }
@@ -162,8 +161,7 @@
             
             <div id="navProfile" class="user-profile">
                 <img id="navAvatar" src="" class="user-avatar">
-                <span id="navName" class="user-name">AGENT</span>
-                
+                <span id="navName" class="user-name">USER</span>
                 <div class="profile-dropdown">
                     <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
                 </div>
@@ -194,7 +192,7 @@
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
-                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED TO REPLY HERE</a>
+                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
                 </div>
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
@@ -260,7 +258,7 @@
                 document.getElementById('navLoginBtn').style.display = 'none';
                 document.getElementById('navProfile').style.display = 'flex';
                 document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
-                document.getElementById('navName').innerText = (user.displayName || "AGENT").toUpperCase();
+                document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
                 document.getElementById('replyGate').style.display = 'none';
                 document.getElementById('replyForm').style.display = 'block';
             } else {
@@ -348,9 +346,13 @@
 
         function buildPostHTML(d, isOP) {
             const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : "---";
+            const color = isOP ? "var(--color-red)" : "#666";
+            
+            // REMOVED: Role assignment (Operator/Agent)
+            
             return `<div class="post-container"><div class="post-header"><span>${date}</span><span>${isOP ? '#1' : 'REPLY'}</span></div>
             <div class="post-layout"><div class="post-user-col"><img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
-            <div style="font-family:'Oswald'; color:${isOP?'var(--color-red)':'#666'};">${d.author}</div><span class="user-role">${isOP?'OPERATOR':'AGENT'}</span></div>
+            <div style="font-family:'Oswald'; color:${color};">${d.author}</div></div>
             <div class="post-content-col">${d.body.replace(/\n/g, '<br>')}</div></div></div>`;
         }
 
@@ -382,7 +384,7 @@
             const body = document.getElementById('newThreadBody').value;
             if(!title || !body) return alert("MISSING FIELDS");
             const ref = await addDoc(collection(db, "threads"), {
-                boardId: bid, title: title, body: body, author: currentUser.displayName || "AGENT",
+                boardId: bid, title: title, body: body, author: currentUser.displayName || "USER",
                 uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
             document.getElementById('createModal').style.display = 'none';
@@ -393,7 +395,7 @@
         document.getElementById('btnSubmitReply').addEventListener('click', async () => {
             const body = document.getElementById('replyInput').value; if(!body) return;
             await addDoc(collection(db, "posts"), {
-                threadId: activeThreadId, body: body, author: currentUser.displayName || "AGENT",
+                threadId: activeThreadId, body: body, author: currentUser.displayName || "USER",
                 uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
             document.getElementById('replyInput').value = "";
