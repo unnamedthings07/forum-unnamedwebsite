@@ -3,53 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Establish Contact // Unnamed Things</title>
+    <title>Connect // UT Forums</title>
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --color-red: #CD201F; --color-black: #050505; }
-        body { background-color: var(--color-black); color: #e0e0e0; font-family: 'Roboto', sans-serif; margin: 0; min-height: 100vh; background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%); }
-        .navbar { position: sticky; top: 0; z-index: 1000; background: rgba(5,5,5,0.95); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        /* --- VARIABLES --- */
+        :root { 
+            --color-red: #CD201F; 
+            --color-red-dim: #8a1515;
+            --color-black: #050505; 
+            --color-dark: #111;
+            --font-head: 'Oswald', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'Special Elite', cursive;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--color-black);
+            color: #e0e0e0;
+            font-family: var(--font-body);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+            display: flex; flex-direction: column;
+        }
+
+        /* --- NAVBAR (FORUM STYLE WITH LOGIN) --- */
+        .navbar {
+            position: sticky; top: 0; z-index: 1000;
+            background: rgba(5,5,5,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center;
+            backdrop-filter: blur(10px);
+        }
         .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .nav-logo { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--color-red); }
-        .brand-text { font-family: 'Special Elite'; font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
+        .brand-text { font-family: var(--font-mono); font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
+        .brand-text span { color: var(--color-red); }
+
         .nav-links { display: flex; gap: 2rem; list-style: none; }
-        .nav-link { font-family: 'Special Elite'; color: #ccc; text-decoration: none; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+        .nav-link { 
+            font-family: var(--font-mono); color: #ccc; text-decoration: none; font-size: 0.9rem; transition: 0.3s; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .nav-link span { color: var(--color-red); }
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
-        .container { max-width: 800px; margin: 0 auto; padding: 4rem 20px; }
-        h1 { font-family: 'Oswald'; font-size: 2.5rem; color: #fff; margin-bottom: 1rem; }
-        .contact-box { background: #111; border: 1px solid #333; padding: 2rem; }
-        input, textarea { width: 100%; background: #080808; border: 1px solid #333; color: #fff; padding: 15px; margin-bottom: 1rem; font-family: 'Roboto'; }
-        input:focus, textarea:focus { border-color: var(--color-red); outline: none; }
-        button { background: var(--color-red); color: #fff; border: none; padding: 12px 30px; font-family: 'Oswald'; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
-        @media (max-width: 768px) { .nav-links { display: none; } }
+        
+        /* USER WIDGET */
+        .user-widget { position: relative; display: flex; align-items: center; gap: 15px; }
+        .btn-login { 
+            background: transparent; border: 1px solid #444; color: #fff; 
+            padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
+            text-decoration: none;
+        }
+        .btn-login:hover { background: var(--color-red); border-color: var(--color-red); }
+        
+        .user-profile { display: none; align-items: center; gap: 10px; cursor: pointer; padding-bottom:10px; margin-bottom:-10px; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #444; }
+        .user-name { font-family: var(--font-head); font-size: 0.9rem; color: var(--color-red); }
+
+        /* DROPDOWN */
+        .profile-dropdown {
+            display: none; position: absolute; top: 100%; right: 0;
+            width: 200px; background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 10px; z-index: 2000; margin-top: 5px;
+        }
+        .profile-dropdown::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; }
+        .user-profile:hover .profile-dropdown, .profile-dropdown:hover { display: block; }
+        .dropdown-item {
+            width: 100%; background: none; border: none; text-align: left;
+            color: #ccc; font-family: var(--font-mono); font-size: 0.9rem;
+            padding: 8px 10px; cursor: pointer; transition: color 0.3s;
+        }
+        .dropdown-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* --- CONTACT CARD STYLES (FROM MAIN SITE) --- */
+        .contact-section {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            position: relative; padding: 2rem 0;
+        }
+        .container { width: 90%; max-width: 1000px; position: relative; height: 100%; display: flex; align-items: center; justify-content: center; }
+
+        .viewfinder-border {
+            position: absolute; pointer-events: none; width: 40px; height: 40px;
+            border-color: rgba(205, 32, 31, 0.6); transition: all 0.3s ease; z-index: 10;
+        }
+        .vf-tl { top: -20px; left: -20px; border-top: 2px solid; border-left: 2px solid; }
+        .vf-tr { top: -20px; right: -20px; border-top: 2px solid; border-right: 2px solid; }
+        .vf-bl { bottom: -20px; left: -20px; border-bottom: 2px solid; border-left: 2px solid; }
+        .vf-br { bottom: -20px; right: -20px; border-bottom: 2px solid; border-right: 2px solid; }
+
+        .contact-card {
+            background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(5px);
+            border: 1px solid rgba(205, 32, 31, 0.3); padding: 4rem 2rem;
+            width: 100%; max-width: 800px; text-align: center; position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Glitch Title */
+        .glitch { font-family: var(--font-mono); font-size: clamp(2rem, 5vw, 3.5rem); color: var(--color-red); position: relative; margin-bottom: 1rem; }
+        .glitch::before, .glitch::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--color-black); }
+        .glitch::before { left: 2px; text-shadow: -1px 0 #00ffff; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 5s infinite linear alternate-reverse; }
+        .glitch::after { left: -2px; text-shadow: -1px 0 #ff00ff; clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 5s infinite linear alternate-reverse; }
+        @keyframes glitch-anim { 0% { clip: rect(10px, 9999px, 30px, 0); } 100% { clip: rect(50px, 9999px, 80px, 0); } }
+        @keyframes glitch-anim2 { 0% { clip: rect(80px, 9999px, 10px, 0); } 100% { clip: rect(30px, 9999px, 90px, 0); } }
+
+        .contact-desc { font-size: 1.1rem; max-width: 600px; margin: 0 auto 3rem auto; color: #ccc; font-weight: 300; }
+
+        .btn-group { display: flex; flex-direction: column; gap: 1.5rem; align-items: center; width: 100%; max-width: 400px; margin: 0 auto; }
+        .btn {
+            display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%;
+            padding: 16px 20px; border-radius: 4px; font-family: var(--font-head); text-transform: uppercase;
+            font-size: 1.1rem; letter-spacing: 2px; text-decoration: none; border: 1px solid transparent; transition: all 0.3s;
+        }
+        .btn svg { width: 24px; height: 24px; fill: currentColor; }
+        
+        .btn-red { background: linear-gradient(45deg, var(--color-red-dim), var(--color-red)); color: white; border: 1px solid var(--color-red); }
+        .btn-red:hover { transform: translateY(-3px); box-shadow: 0 0 30px rgba(205, 32, 31, 0.6); }
+        
+        .btn-outline { background: transparent; color: #E0E0E0; border: 1px solid #444; }
+        .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); transform: translateY(-3px); color: #fff; }
+
+        @keyframes warning-pulse { 0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--color-red); } 50% { opacity: 0.7; } }
+        .caution-text { margin-top: 4rem; font-family: var(--font-head); color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .caution-text span { color: var(--color-red); font-weight: 700; animation: warning-pulse 2s infinite ease-in-out; display: inline-block; margin-left: 5px; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .contact-card { padding: 2.5rem 1.5rem; border: none; background: transparent; box-shadow: none; }
+            .viewfinder-border { display: none; }
+        }
     </style>
 </head>
 <body>
+
     <nav class="navbar">
         <a href="index.html" class="nav-brand">
             <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
-            <div class="brand-text"><span style="color:#CD201F">U</span>nnamed <span>T</span>hings</div>
+            <div class="brand-text"><span>U</span>nnamed <span>T</span>hings // FORUMS</div>
         </a>
+
         <ul class="nav-links">
-            <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link">MAIN DATABASE</a></li>
-            <li><a href="index.html" class="nav-link">FORUMS</a></li>
+            <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link"><span>M</span>AIN DATABASE</a></li>
+            <li><a href="index.html" class="nav-link"><span>F</span>ORUM INDEX</a></li>
         </ul>
+
+        <div class="user-widget">
+            <a href="login.html" id="navLoginBtn" class="btn-login">LOGIN</a>
+            
+            <div id="navProfile" class="user-profile">
+                <img id="navAvatar" src="" class="user-avatar">
+                <span id="navName" class="user-name">AGENT</span>
+                <div class="profile-dropdown">
+                    <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <div class="container">
-        <h1>SECURE CHANNEL</h1>
-        <p style="color:#888; font-family:'Special Elite'; margin-bottom:2rem;">
-            Use this frequency for direct communication regarding bugs, inquiries, or confidential tips.
-        </p>
-        <div class="contact-box">
-            <form action="https://formspree.io/f/YOUR_FORM_ID_HERE" method="POST">
-                <input type="email" name="email" placeholder="YOUR EMAIL (REQUIRED)" required>
-                <input type="text" name="subject" placeholder="SUBJECT" required>
-                <textarea name="message" rows="6" placeholder="TRANSMISSION CONTENT..." required></textarea>
-                <button type="submit">SEND TRANSMISSION</button>
-            </form>
+    <main class="contact-section">
+        <div class="container">
+            <div class="viewfinder-border vf-tl"></div>
+            <div class="viewfinder-border vf-tr"></div>
+            <div class="viewfinder-border vf-bl"></div>
+            <div class="viewfinder-border vf-br"></div>
+
+            <div class="contact-card">
+                <div style="position:relative; display:inline-block;">
+                    <h1 class="glitch" data-text="ESTABLISH CONNECTION">ESTABLISH CONNECTION</h1>
+                </div>
+                
+                <p class="contact-desc">
+                    Reach me via these encrypted channels. All inquiries are welcome, but please maintain respect within the community.
+                </p>
+
+                <div class="btn-group">
+                    <a href="https://www.youtube.com/@unnamedthings07" target="_blank" class="btn btn-red">
+                        <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83 1.48 1.73-1.73.47-.13 1.33.22 2.65.28 1.3.07 2.49.1 3.59.1L12 5c4.19 0 6.8-.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+                        <span>Official Channel</span>
+                    </a>
+                    
+                    <a href="https://www.instagram.com/ub.things07" target="_blank" class="btn btn-outline">
+                        <svg viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8A3.6 3.6 0 0 0 20 16.4V7.6A3.6 3.6 0 0 0 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+                        <span>Instagram Feed</span>
+                    </a>
+
+                    <a href="mailto:admin@unnamedthings07.qzz.io" class="btn btn-outline">
+                        <svg viewBox="0 0 24 24"><path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"/></svg>
+                        <span>Direct Email</span>
+                    </a>
+                </div>
+
+                <div class="caution-text">
+                    Engage With <span>Caution</span>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwIMRuv26pcAndpd36EkLbUpSGvh6ptSY",
+            authDomain: "unnamed-things-website-70cf7.firebaseapp.com",
+            projectId: "unnamed-things-website-70cf7",
+            storageBucket: "unnamed-things-website-70cf7.firebasestorage.app",
+            messagingSenderId: "293788800527",
+            appId: "1:293788800527:web:575a1fd1f60d6361f3357a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // UI Logic
+        onAuthStateChanged(auth, (user) => {
+            if(user) {
+                document.getElementById('navLoginBtn').style.display = 'none';
+                document.getElementById('navProfile').style.display = 'flex';
+                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+                document.getElementById('navName').innerText = (user.displayName || "AGENT").toUpperCase();
+            } else {
+                document.getElementById('navLoginBtn').style.display = 'block';
+                document.getElementById('navProfile').style.display = 'none';
+            }
+        });
+
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.reload());
+        });
+    </script>
 </body>
 </html>
