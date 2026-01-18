@@ -54,6 +54,7 @@
         .btn-login { 
             background: transparent; border: 1px solid #444; color: #fff; 
             padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
+            text-decoration: none; /* Important for <a> tag */
         }
         .btn-login:hover { background: var(--color-red); border-color: var(--color-red); }
         
@@ -183,13 +184,13 @@
         </a>
 
         <ul class="nav-links">
-            <li><a href="https://unnamedthings07.qzz.io/videos/video-page.html" class="nav-link"><span>V</span>ideos</a></li>
-            <li><a href="https://unnamedthings07.qzz.io/articles/articles-page.html" class="nav-link"><span>A</span>rticles</a></li>
-            <li><a href="https://unnamedthings07.qzz.io/contact.html" class="nav-link"><span>C</span>onnect</a></li>
+            <li><a href="https://www.unnamedthings07.qzz.io/videos/video-page" class="nav-link"><span>V</span>ideos</a></li>
+            <li><a href="https://www.unnamedthings07.qzz.io/articles/articles-page" class="nav-link"><span>A</span>rticles</a></li>
+            <li><a href="https://www.unnamedthings07.qzz.io/contact" class="nav-link"><span>C</span>onnect</a></li>
         </ul>
 
         <div class="user-widget">
-            <a href="login.html" id="navLoginBtn" class="btn-login" style="text-decoration:none;">LOGIN</a>
+            <a href="login.html" id="navLoginBtn" class="btn-login">LOGIN</a>
             <div id="navProfile" class="user-profile">
                 <img id="navAvatar" src="" class="user-avatar">
                 <span id="navName" class="user-name">AGENT</span>
@@ -224,8 +225,8 @@
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
-    <a href="login.html" style="color:var(--color-red); font-family:var(--font-head);">AUTHENTICATE TO TRANSMIT</a>
-</div>
+                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED TO TRANSMIT</a>
+                </div>
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
                     <button id="btnSubmitReply" class="btn-new-thread">TRANSMIT</button>
@@ -265,6 +266,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // --- CONFIGURATION ---
         const firebaseConfig = {
@@ -281,7 +283,7 @@
         const auth = getAuth(app);
         let currentUser = null;
 
-        // --- FORUM STRUCTURE (HARDCODED DIVISIONS) ---
+        // --- FORUM STRUCTURE ---
         const FORUM_DATA = [
             {
                 title: "OFFICIAL CHANNELS",
@@ -300,7 +302,7 @@
             }
         ];
 
-        // --- AUTHENTICATION ---
+        // --- AUTHENTICATION STATE ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if(user) {
@@ -319,7 +321,7 @@
                 document.getElementById('replyForm').style.display = 'none';
             }
         });
-        
+
         document.getElementById('navProfile').addEventListener('click', () => {
             if(confirm("Disconnect Session?")) signOut(auth);
         });
