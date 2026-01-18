@@ -8,13 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE VARIABLES & RESET --- */
+        /* --- CORE VARIABLES --- */
         :root { 
             --color-red: #CD201F; 
-            --color-red-dim: #8a1515;
             --color-black: #050505; 
             --color-dark: #111;
-            --color-border: #333;
             --font-head: 'Oswald', sans-serif;
             --font-body: 'Roboto', sans-serif;
             --font-mono: 'Special Elite', cursive;
@@ -29,13 +27,14 @@
             background-image: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
         }
 
-        /* --- NAVBAR (MATCHING MAIN SITE) --- */
+        /* --- NAVBAR --- */
         .navbar {
             position: sticky; top: 0; z-index: 1000;
             background: rgba(5,5,5,0.95); border-bottom: 1px solid rgba(255,255,255,0.1);
             padding: 0 5%; height: 70px; display: flex; justify-content: space-between; align-items: center;
             backdrop-filter: blur(10px);
         }
+        /* BRAND LINK -> Points to FORUM ROOT */
         .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
         .nav-logo { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--color-red); }
         .brand-text { font-family: var(--font-mono); font-size: 1.1rem; color: #fff; letter-spacing: 1px; }
@@ -49,151 +48,125 @@
         .nav-link span { color: var(--color-red); }
         .nav-link:hover { color: #fff; text-shadow: 0 0 10px var(--color-red); }
         
-        /* User Profile Widget */
-        .user-widget { position: relative; display: flex; align-items: center; gap: 15px; }
+        /* --- USER WIDGET (HOVER POPUP) --- */
+        .user-widget { position: relative; display: flex; align-items: center; }
+        
         .btn-login { 
             background: transparent; border: 1px solid #444; color: #fff; 
             padding: 5px 15px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; 
-            text-decoration: none; /* Important for <a> tag */
+            text-decoration: none;
         }
         .btn-login:hover { background: var(--color-red); border-color: var(--color-red); }
         
-        .user-profile { display: none; align-items: center; gap: 10px; cursor: pointer; }
+        .user-profile { display: none; align-items: center; gap: 10px; cursor: pointer; padding-bottom:10px; margin-bottom:-10px; }
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #444; }
         .user-name { font-family: var(--font-head); font-size: 0.9rem; color: var(--color-red); }
 
+        /* DROPDOWN MENU */
+        .profile-dropdown {
+            display: none; 
+            position: absolute; top: 100%; right: 0;
+            width: 200px; background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333; backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            padding: 10px; z-index: 2000; margin-top: 5px;
+        }
+        /* INVISIBLE BRIDGE (Fixes the disappearing issue) */
+        .profile-dropdown::before {
+            content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px;
+        }
+        /* SHOW ON HOVER */
+        .user-profile:hover .profile-dropdown, .profile-dropdown:hover { display: block; }
+
+        .dropdown-item {
+            width: 100%; background: none; border: none; text-align: left;
+            color: #ccc; font-family: var(--font-mono); font-size: 0.9rem;
+            padding: 8px 10px; cursor: pointer; transition: color 0.3s;
+        }
+        .dropdown-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+
         /* --- MAIN LAYOUT --- */
         .container { max-width: 1100px; margin: 0 auto; padding: 2rem 20px; }
-
-        /* --- BREADCRUMBS --- */
-        .breadcrumbs { 
-            margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.8rem; color: #666; 
-            display: flex; gap: 10px; align-items: center;
-        }
+        .breadcrumbs { margin-bottom: 1.5rem; font-family: var(--font-mono); font-size: 0.8rem; color: #666; display: flex; gap: 10px; align-items: center; }
         .crumb-link { color: #888; text-decoration: none; cursor: pointer; }
         .crumb-link:hover { color: var(--color-red); }
         .crumb-active { color: #fff; }
 
-        /* --- FORUM INDEX (CATEGORIES) --- */
+        /* --- FORUM STYLES --- */
         .category-block { margin-bottom: 2rem; border: 1px solid var(--color-border); background: #0a0a0a; }
-        .cat-header {
-            background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .cat-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border); }
         .cat-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--color-red); letter-spacing: 1px; }
-        
-        .board-row {
-            display: grid; grid-template-columns: 50px 1fr 150px; 
-            padding: 20px; border-bottom: 1px solid #222; transition: 0.2s;
-            text-decoration: none; color: inherit;
-        }
-        .board-row:last-child { border-bottom: none; }
+        .board-row { display: grid; grid-template-columns: 50px 1fr 150px; padding: 20px; border-bottom: 1px solid #222; text-decoration: none; color: inherit; transition: 0.2s; }
         .board-row:hover { background: #111; }
-        
-        .board-icon { 
-            color: #444; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; 
-        }
+        .board-row:last-child { border-bottom: none; }
+        .board-icon { color: #444; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
         .board-row:hover .board-icon { color: var(--color-red); }
-        
         .board-info h3 { font-family: var(--font-head); font-size: 1.2rem; margin-bottom: 5px; color: #e0e0e0; }
-        .board-desc { font-size: 0.9rem; color: #888; line-height: 1.4; }
-        .board-stats { 
-            display: flex; flex-direction: column; justify-content: center; align-items: flex-end; 
-            font-family: var(--font-mono); font-size: 0.8rem; color: #555; 
-        }
+        .board-desc { font-size: 0.9rem; color: #888; }
+        .board-stats { display: flex; align-items: center; justify-content: flex-end; font-family: var(--font-mono); font-size: 0.8rem; color: #555; }
 
-        /* --- THREAD LIST VIEW --- */
-        .board-header { 
-            display: flex; justify-content: space-between; align-items: flex-end; 
-            margin-bottom: 2rem; border-bottom: 2px solid var(--color-border); padding-bottom: 1rem; 
-        }
-        .btn-new-thread {
-            background: var(--color-red); color: #fff; border: none; padding: 10px 25px;
-            font-family: var(--font-head); letter-spacing: 1px; cursor: pointer; transition: 0.3s;
-        }
-        .btn-new-thread:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
-
-        .thread-row {
-            background: #111; border: 1px solid var(--color-border); padding: 1.5rem; 
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: 0.2s;
-        }
+        /* THREADS */
+        .thread-row { background: #111; border: 1px solid #333; padding: 1.5rem; margin-bottom: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
         .thread-row:hover { border-color: var(--color-red); transform: translateX(5px); }
-        
         .thread-main h4 { font-family: var(--font-head); font-size: 1.1rem; margin-bottom: 5px; color: #fff; }
         .thread-meta { font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
         .thread-author { color: var(--color-red); }
-
-        /* --- SINGLE THREAD VIEW --- */
-        .post-container { margin-bottom: 2rem; border: 1px solid var(--color-border); background: #0e0e0e; }
-        .post-header {
-            background: #151515; padding: 10px 20px; border-bottom: 1px solid var(--color-border);
-            display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.8rem; color: #666;
-        }
-        .post-layout { display: flex; }
-        .post-user-col {
-            width: 180px; background: #111; padding: 20px; border-right: 1px solid var(--color-border);
-            text-align: center; flex-shrink: 0;
-        }
-        .user-avatar-large { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #333; margin-bottom: 10px; }
-        .user-role { font-family: var(--font-head); font-size: 0.8rem; background: #333; color: #fff; padding: 2px 8px; display: inline-block; margin-top: 5px; }
         
+        /* POSTS */
+        .post-container { margin-bottom: 2rem; border: 1px solid #333; background: #0e0e0e; }
+        .post-header { background: #151515; padding: 10px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.8rem; color: #666; }
+        .post-layout { display: flex; }
+        .post-user-col { width: 180px; background: #111; padding: 20px; border-right: 1px solid #333; text-align: center; flex-shrink: 0; }
+        .user-avatar-large { width: 80px; height: 80px; border-radius: 50%; border: 2px solid #333; margin-bottom: 10px; }
         .post-content-col { padding: 25px; font-size: 1rem; line-height: 1.6; color: #ddd; flex-grow: 1; }
-
-        /* Reply Box */
         .reply-area { margin-top: 2rem; border-top: 2px solid #333; padding-top: 2rem; }
-        textarea {
-            width: 100%; background: #080808; border: 1px solid #333; color: #fff; 
-            padding: 15px; font-family: var(--font-body); min-height: 120px; margin-bottom: 1rem;
-        }
+        textarea { width: 100%; background: #080808; border: 1px solid #333; color: #fff; padding: 15px; font-family: var(--font-body); min-height: 120px; margin-bottom: 1rem; }
         textarea:focus { border-color: var(--color-red); outline: none; }
 
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
-            justify-content: center; align-items: center;
-        }
+        /* BUTTONS */
+        .btn-action { background: var(--color-red); color: #fff; border: none; padding: 10px 25px; font-family: var(--font-head); cursor: pointer; transition: 0.3s; }
+        .btn-action:hover { background: #ff3333; box-shadow: 0 0 15px rgba(205,32,31,0.4); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; justify-content: center; align-items: center; }
         .modal-box { width: 90%; max-width: 600px; background: #111; border: 1px solid var(--color-red); padding: 2rem; }
         .form-group { margin-bottom: 1rem; }
         .form-label { display: block; font-family: var(--font-mono); font-size: 0.8rem; color: #888; margin-bottom: 5px; }
-        select, input[type="text"] {
-            width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px;
-        }
-
-        /* Mobile Responsive */
+        input[type="text"], select { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; }
+        
+        .hidden { display: none; }
+        
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .board-row { grid-template-columns: 1fr; }
-            .board-icon, .board-stats { display: none; }
+            .nav-links { display: none; } /* Hide extra links on mobile for simplicity */
             .post-layout { flex-direction: column; }
             .post-user-col { width: 100%; border-right: none; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 15px; padding: 10px; text-align: left; }
             .user-avatar-large { width: 40px; height: 40px; margin: 0; }
         }
-
-        /* Utility */
-        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <a href="https://unnamedthings07.qzz.io" class="nav-brand">
+        <a href="https://forums.unnamedthings07.qzz.io" class="nav-brand">
             <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
             <div class="brand-text"><span>U</span>nnamed <span>T</span>hings // FORUMS</div>
         </a>
 
         <ul class="nav-links">
-            <li><a href="https://www.unnamedthings07.qzz.io/videos/video-page" class="nav-link"><span>V</span>ideos</a></li>
-            <li><a href="https://www.unnamedthings07.qzz.io/articles/articles-page" class="nav-link"><span>A</span>rticles</a></li>
-            <li><a href="https://www.unnamedthings07.qzz.io/contact" class="nav-link"><span>C</span>onnect</a></li>
+            <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link"><span>M</span>AIN DATABASE</a></li>
+            <li><a href="connect.html" class="nav-link"><span>C</span>ONNECT</a></li>
         </ul>
 
         <div class="user-widget">
             <a href="login.html" id="navLoginBtn" class="btn-login">LOGIN</a>
+            
             <div id="navProfile" class="user-profile">
                 <img id="navAvatar" src="" class="user-avatar">
                 <span id="navName" class="user-name">AGENT</span>
+                
+                <div class="profile-dropdown">
+                    <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -203,62 +176,43 @@
             <span class="crumb-link crumb-active">INDEX</span>
         </div>
 
-        <div id="viewIndex">
-            </div>
+        <div id="viewIndex"></div>
 
         <div id="viewBoard" class="hidden">
-            <div class="board-header">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2rem; border-bottom:2px solid #333; padding-bottom:1rem;">
                 <div>
-                    <h1 id="boardTitle" style="font-family:'Oswald'; color:#fff; font-size:2rem;">BOARD TITLE</h1>
-                    <div id="boardDesc" style="color:#666; font-family:'Special Elite';">Description loading...</div>
+                    <h1 id="boardTitle" style="font-family:'Oswald'; color:#fff; font-size:2rem; margin:0;">BOARD</h1>
+                    <div id="boardDesc" style="color:#666; font-family:'Special Elite'; margin-top:5px;">...</div>
                 </div>
-                <button class="btn-new-thread" onclick="openCreateModal()">+ NEW THREAD</button>
+                <button class="btn-action" onclick="openCreateModal()">+ NEW THREAD</button>
             </div>
-            <div id="threadListContainer">
-                </div>
+            <div id="threadListContainer"></div>
         </div>
 
         <div id="viewThread" class="hidden">
-            <div id="threadContent">
-                </div>
-
+            <div id="threadContent"></div>
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
-                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED TO TRANSMIT</a>
+                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
                 </div>
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
-                    <button id="btnSubmitReply" class="btn-new-thread">TRANSMIT</button>
+                    <button id="btnSubmitReply" class="btn-action">TRANSMIT</button>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div id="createModal" class="modal-overlay">
         <div class="modal-box">
             <h2 style="font-family:'Oswald'; color:#fff; margin-bottom:1.5rem;">INITIATE NEW THREAD</h2>
-            
-            <div class="form-group">
-                <label class="form-label">TARGET FREQUENCY (BOARD)</label>
-                <select id="newThreadBoard">
-                    </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">SUBJECT</label>
-                <input type="text" id="newThreadTitle" placeholder="Enter topic title...">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">CONTENT</label>
-                <textarea id="newThreadBody" style="height:200px;" placeholder="Enter message..."></textarea>
-            </div>
-
+            <div class="form-group"><label class="form-label">TARGET FREQUENCY (BOARD)</label><select id="newThreadBoard"></select></div>
+            <div class="form-group"><label class="form-label">SUBJECT</label><input type="text" id="newThreadTitle" placeholder="Title..."></div>
+            <div class="form-group"><label class="form-label">CONTENT</label><textarea id="newThreadBody" style="height:200px;" placeholder="Message..."></textarea></div>
             <div style="display:flex; justify-content:flex-end; gap:10px;">
                 <button onclick="document.getElementById('createModal').style.display='none'" style="background:none; border:1px solid #333; color:#fff; padding:10px 20px; cursor:pointer;">CANCEL</button>
-                <button id="btnSubmitThread" class="btn-new-thread">BROADCAST</button>
+                <button id="btnSubmitThread" class="btn-action">BROADCAST</button>
             </div>
         </div>
     </div>
@@ -268,7 +222,6 @@
         import { getFirestore, collection, addDoc, getDoc, getDocs, doc, query, where, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDwIMRuv26pcAndpd36EkLbUpSGvh6ptSY",
             authDomain: "unnamed-things-website-70cf7.firebaseapp.com",
@@ -283,7 +236,6 @@
         const auth = getAuth(app);
         let currentUser = null;
 
-        // --- FORUM STRUCTURE ---
         const FORUM_DATA = [
             {
                 title: "OFFICIAL CHANNELS",
@@ -295,14 +247,13 @@
             {
                 title: "COMMUNITY TERMINAL",
                 boards: [
-                    { id: "theories", title: "Theories & Speculation", desc: "User-submitted theories and investigations." },
-                    { id: "off-topic", title: "Off-Topic", desc: "General discussion unrelated to active cases." },
+                    { id: "theories", title: "Theories & Speculation", desc: "User-submitted theories." },
+                    { id: "off-topic", title: "Off-Topic", desc: "General discussion." },
                     { id: "feedback", title: "Site Feedback", desc: "Bug reports and feature requests." }
                 ]
             }
         ];
 
-        // --- AUTHENTICATION STATE ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if(user) {
@@ -310,281 +261,144 @@
                 document.getElementById('navProfile').style.display = 'flex';
                 document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = (user.displayName || "AGENT").toUpperCase();
-                
                 document.getElementById('replyGate').style.display = 'none';
                 document.getElementById('replyForm').style.display = 'block';
             } else {
                 document.getElementById('navLoginBtn').style.display = 'block';
                 document.getElementById('navProfile').style.display = 'none';
-                
                 document.getElementById('replyGate').style.display = 'block';
                 document.getElementById('replyForm').style.display = 'none';
             }
         });
 
-        document.getElementById('navProfile').addEventListener('click', () => {
-            if(confirm("Disconnect Session?")) signOut(auth);
+        document.getElementById('navLogoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => window.location.reload());
         });
 
-        // --- NAVIGATION & ROUTING ---
         window.addEventListener('popstate', handleRoute);
-
         function handleRoute() {
             const params = new URLSearchParams(window.location.search);
             const boardId = params.get('b');
             const threadId = params.get('t');
-
-            // Hide all views
             document.getElementById('viewIndex').classList.add('hidden');
             document.getElementById('viewBoard').classList.add('hidden');
             document.getElementById('viewThread').classList.add('hidden');
-
-            if(threadId) {
-                renderThread(threadId);
-            } else if(boardId) {
-                renderBoard(boardId);
-            } else {
-                renderIndex();
-            }
+            if(threadId) renderThread(threadId);
+            else if(boardId) renderBoard(boardId);
+            else renderIndex();
         }
+        function navigate(path) { history.pushState({}, '', path); handleRoute(); }
 
-        function navigate(path) {
-            history.pushState({}, '', path);
-            handleRoute();
-        }
-
-        // --- RENDERERS ---
-
-        // 1. HOME INDEX
         function renderIndex() {
-            const container = document.getElementById('viewIndex');
-            container.innerHTML = "";
-            container.classList.remove('hidden');
-            updateBreadcrumbs([]);
-
+            const c = document.getElementById('viewIndex');
+            c.innerHTML = ""; c.classList.remove('hidden'); updateBreadcrumbs([]);
             FORUM_DATA.forEach(cat => {
-                const catDiv = document.createElement('div');
-                catDiv.className = 'category-block';
-                
-                let boardsHTML = "";
-                cat.boards.forEach(board => {
-                    boardsHTML += `
-                        <a href="javascript:void(0)" onclick="window.navToBoard('${board.id}')" class="board-row">
-                            <div class="board-icon">#</div>
-                            <div class="board-info">
-                                <h3>${board.title}</h3>
-                                <div class="board-desc">${board.desc}</div>
-                            </div>
-                            <div class="board-stats">ACCESS ></div>
-                        </a>
-                    `;
+                let html = `<div class="category-block"><div class="cat-header"><span class="cat-title">${cat.title}</span></div>`;
+                cat.boards.forEach(b => {
+                    html += `<a href="javascript:void(0)" onclick="window.navToBoard('${b.id}')" class="board-row">
+                        <div class="board-icon">#</div>
+                        <div class="board-info"><h3>${b.title}</h3><div class="board-desc">${b.desc}</div></div>
+                        <div class="board-stats">ACCESS ></div></a>`;
                 });
-
-                catDiv.innerHTML = `
-                    <div class="cat-header"><span class="cat-title">${cat.title}</span></div>
-                    ${boardsHTML}
-                `;
-                container.appendChild(catDiv);
+                html += `</div>`; c.innerHTML += html;
             });
         }
 
-        // 2. BOARD VIEW
-        function renderBoard(boardId) {
-            const board = findBoardInfo(boardId);
-            if(!board) return navigate('/');
-
+        function renderBoard(bid) {
+            const b = findBoardInfo(bid); if(!b) return navigate('/');
             document.getElementById('viewBoard').classList.remove('hidden');
-            document.getElementById('boardTitle').innerText = board.title;
-            document.getElementById('boardDesc').innerText = board.desc;
-            updateBreadcrumbs([{text: board.title, active: true}]);
-
+            document.getElementById('boardTitle').innerText = b.title;
+            document.getElementById('boardDesc').innerText = b.desc;
+            updateBreadcrumbs([{text: b.title, active: true}]);
             const list = document.getElementById('threadListContainer');
-            list.innerHTML = "<div style='padding:20px; color:#666;'>Scanning frequencies...</div>";
-
-            const q = query(collection(db, "threads"), where("boardId", "==", boardId), orderBy("timestamp", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
+            list.innerHTML = "<div style='padding:20px; color:#666;'>Scanning...</div>";
+            const q = query(collection(db, "threads"), where("boardId", "==", bid), orderBy("timestamp", "desc"));
+            onSnapshot(q, (s) => {
                 list.innerHTML = "";
-                if(snapshot.empty) {
-                    list.innerHTML = "<div style='padding:20px; color:#666;'>NO SIGNALS DETECTED.</div>";
-                    return;
-                }
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : "Unknown";
-                    
-                    const div = document.createElement('div');
-                    div.className = 'thread-row';
-                    div.innerHTML = `
-                        <div class="thread-main">
-                            <h4>${data.title}</h4>
-                            <div class="thread-meta">Started by <span class="thread-author">${data.author}</span></div>
-                        </div>
-                        <div class="thread-meta">${date}</div>
-                    `;
-                    div.onclick = () => window.navToThread(doc.id);
-                    list.appendChild(div);
+                if(s.empty) { list.innerHTML = "<div style='padding:20px; color:#444;'>NO SIGNALS DETECTED.</div>"; return; }
+                s.forEach(d => {
+                    const data = d.data();
+                    const date = data.timestamp ? data.timestamp.toDate().toLocaleDateString() : "---";
+                    list.innerHTML += `<div class="thread-row" onclick="window.navToThread('${d.id}')">
+                        <div class="thread-main"><h4>${data.title}</h4><div class="thread-meta">By <span class="thread-author">${data.author}</span></div></div>
+                        <div class="thread-meta">${date}</div></div>`;
                 });
             });
         }
 
-        // 3. THREAD VIEW
         let activeThreadId = null;
-
-        async function renderThread(threadId) {
-            activeThreadId = threadId;
+        async function renderThread(tid) {
+            activeThreadId = tid;
             document.getElementById('viewThread').classList.remove('hidden');
-            const container = document.getElementById('threadContent');
-            container.innerHTML = "Loading...";
-
-            const threadSnap = await getDoc(doc(db, "threads", threadId));
-            if(!threadSnap.exists()) return navigate('/');
-            const tData = threadSnap.data();
-
-            // Set Breadcrumbs
-            const board = findBoardInfo(tData.boardId);
-            updateBreadcrumbs([
-                {text: board ? board.title : "Unknown", onclick: `window.navToBoard('${tData.boardId}')`},
-                {text: tData.title, active: true}
-            ]);
-
-            // Render OP
-            container.innerHTML = `
-                <h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
-                ${buildPostHTML(tData, true)}
-                <div id="replies-container"></div>
-            `;
-
-            // Load Replies
-            const q = query(collection(db, "posts"), where("threadId", "==", threadId), orderBy("timestamp", "asc"));
-            onSnapshot(q, (snapshot) => {
-                const repCont = document.getElementById('replies-container');
-                repCont.innerHTML = "";
-                snapshot.forEach(doc => {
-                    repCont.innerHTML += buildPostHTML(doc.data(), false);
-                });
+            const c = document.getElementById('threadContent');
+            c.innerHTML = "Loading...";
+            const snap = await getDoc(doc(db, "threads", tid));
+            if(!snap.exists()) return navigate('/');
+            const tData = snap.data();
+            const b = findBoardInfo(tData.boardId);
+            updateBreadcrumbs([{text: b ? b.title : "...", onclick: `window.navToBoard('${tData.boardId}')`}, {text: tData.title, active: true}]);
+            c.innerHTML = `<h1 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem; border-bottom:1px solid #333; padding-bottom:10px;">${tData.title}</h1>
+            ${buildPostHTML(tData, true)}<div id="replies-container"></div>`;
+            const q = query(collection(db, "posts"), where("threadId", "==", tid), orderBy("timestamp", "asc"));
+            onSnapshot(q, (s) => {
+                const rc = document.getElementById('replies-container'); rc.innerHTML = "";
+                s.forEach(d => rc.innerHTML += buildPostHTML(d.data(), false));
             });
         }
 
-        // HTML Builder for Posts
-        function buildPostHTML(data, isOP) {
-            const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : "Unknown";
-            const role = isOP ? "OPERATOR" : "AGENT";
-            const color = isOP ? "var(--color-red)" : "#666";
-
-            return `
-                <div class="post-container">
-                    <div class="post-header">
-                        <span>${date}</span>
-                        <span>#${isOP ? '1' : 'REPLY'}</span>
-                    </div>
-                    <div class="post-layout">
-                        <div class="post-user-col">
-                            <img src="${data.photo || 'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
-                            <div style="font-family:'Oswald'; color:${color};">${data.author}</div>
-                            <span class="user-role">${role}</span>
-                        </div>
-                        <div class="post-content-col">
-                            ${data.body.replace(/\n/g, '<br>')}
-                        </div>
-                    </div>
-                </div>
-            `;
+        function buildPostHTML(d, isOP) {
+            const date = d.timestamp ? d.timestamp.toDate().toLocaleString() : "---";
+            return `<div class="post-container"><div class="post-header"><span>${date}</span><span>${isOP ? '#1' : 'REPLY'}</span></div>
+            <div class="post-layout"><div class="post-user-col"><img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
+            <div style="font-family:'Oswald'; color:${isOP?'var(--color-red)':'#666'};">${d.author}</div><span class="user-role">${isOP?'OPERATOR':'AGENT'}</span></div>
+            <div class="post-content-col">${d.body.replace(/\n/g, '<br>')}</div></div></div>`;
         }
 
-        // --- HELPERS ---
-        function findBoardInfo(id) {
-            for(let cat of FORUM_DATA) {
-                const board = cat.boards.find(b => b.id === id);
-                if(board) return board;
-            }
-            return null;
-        }
-
+        function findBoardInfo(id) { for(let c of FORUM_DATA) { const b = c.boards.find(x => x.id === id); if(b) return b; } return null; }
         function updateBreadcrumbs(items) {
-            const bc = document.getElementById('breadcrumbs');
-            bc.innerHTML = `<a href="javascript:void(0)" onclick="window.navToIndex()" class="crumb-link">INDEX</a>`;
-            items.forEach(item => {
-                bc.innerHTML += ` <span>/</span> `;
-                if(item.active) {
-                    bc.innerHTML += `<span class="crumb-active">${item.text}</span>`;
-                } else {
-                    bc.innerHTML += `<a href="javascript:void(0)" onclick="${item.onclick}" class="crumb-link">${item.text}</a>`;
-                }
-            });
+            const bc = document.getElementById('breadcrumbs'); bc.innerHTML = `<a href="javascript:void(0)" onclick="window.navToIndex()" class="crumb-link">INDEX</a>`;
+            items.forEach(i => bc.innerHTML += ` <span>/</span> ${i.active ? `<span class="crumb-active">${i.text}</span>` : `<a href="javascript:void(0)" onclick="${i.onclick}" class="crumb-link">${i.text}</a>`}`);
         }
 
-        // --- GLOBAL EXPORTS (For HTML onClick) ---
         window.navToIndex = () => navigate('/');
         window.navToBoard = (id) => navigate(`?b=${id}`);
         window.navToThread = (id) => navigate(`?t=${id}`);
-        
         window.openCreateModal = () => {
             if(!currentUser) return alert("LOGIN REQUIRED");
-            
-            // Populate Dropdown
-            const select = document.getElementById('newThreadBoard');
-            select.innerHTML = "";
-            FORUM_DATA.forEach(cat => {
-                const group = document.createElement('optgroup');
-                group.label = cat.title;
-                cat.boards.forEach(b => {
-                    const opt = document.createElement('option');
-                    opt.value = b.id;
-                    opt.innerText = b.title;
-                    group.appendChild(opt);
-                });
-                select.appendChild(group);
+            const sel = document.getElementById('newThreadBoard'); sel.innerHTML = "";
+            FORUM_DATA.forEach(c => {
+                let grp = document.createElement('optgroup'); grp.label = c.title;
+                c.boards.forEach(b => { let opt = document.createElement('option'); opt.value = b.id; opt.innerText = b.title; grp.appendChild(opt); });
+                sel.appendChild(grp);
             });
-            
-            // Auto-select current board if viewing one
             const params = new URLSearchParams(window.location.search);
-            const currentB = params.get('b');
-            if(currentB) select.value = currentB;
-
+            if(params.get('b')) sel.value = params.get('b');
             document.getElementById('createModal').style.display = 'flex';
-        }
+        };
 
-        // --- SUBMISSION HANDLERS ---
         document.getElementById('btnSubmitThread').addEventListener('click', async () => {
-            const boardId = document.getElementById('newThreadBoard').value;
+            const bid = document.getElementById('newThreadBoard').value;
             const title = document.getElementById('newThreadTitle').value;
             const body = document.getElementById('newThreadBody').value;
-
-            if(!title || !body) return alert("FIELDS REQUIRED");
-
+            if(!title || !body) return alert("MISSING FIELDS");
             const ref = await addDoc(collection(db, "threads"), {
-                boardId: boardId,
-                title: title,
-                body: body,
-                author: currentUser.displayName || "AGENT",
-                uid: currentUser.uid,
-                photo: currentUser.photoURL,
-                timestamp: serverTimestamp()
+                boardId: bid, title: title, body: body, author: currentUser.displayName || "AGENT",
+                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
-
             document.getElementById('createModal').style.display = 'none';
-            document.getElementById('newThreadTitle').value = "";
-            document.getElementById('newThreadBody').value = "";
+            document.getElementById('newThreadTitle').value = ""; document.getElementById('newThreadBody').value = "";
             window.navToThread(ref.id);
         });
 
         document.getElementById('btnSubmitReply').addEventListener('click', async () => {
-            const body = document.getElementById('replyInput').value;
-            if(!body) return;
-
+            const body = document.getElementById('replyInput').value; if(!body) return;
             await addDoc(collection(db, "posts"), {
-                threadId: activeThreadId,
-                body: body,
-                author: currentUser.displayName || "AGENT",
-                uid: currentUser.uid,
-                photo: currentUser.photoURL,
-                timestamp: serverTimestamp()
+                threadId: activeThreadId, body: body, author: currentUser.displayName || "AGENT",
+                uid: currentUser.uid, photo: currentUser.photoURL, timestamp: serverTimestamp()
             });
             document.getElementById('replyInput').value = "";
         });
 
-        // INIT
         handleRoute();
     </script>
 </body>
