@@ -570,31 +570,67 @@
         }
 
         // --- HOVER CARD LOGIC ---
-        let fetchCache = {}; // Cache user data to avoid spamming DB
+        // --- HOVER CARD LOGIC (IMPROVED) ---
+        let fetchCache = {}; // Cache to prevent spamming DB
 
         window.showUserCard = async (e, uid) => {
             const pop = document.getElementById(`pop-${uid}`);
             if(!pop) return;
             pop.style.display = 'block';
 
-            // Check Cache first
+            // 1. CHECK CACHE FIRST
             if(fetchCache[uid]) {
                 fillPop(uid, fetchCache[uid]);
                 return;
             }
 
-            // Fetch from DB
+            // 2. FETCH FROM DB
             try {
                 const docSnap = await getDoc(doc(db, "users", uid));
+                
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    fetchCache[uid] = data;
+                    fetchCache[uid] = data; // Save to cache
                     fillPop(uid, data);
                 } else {
-                    document.getElementById(`bio-${uid}`).innerText = "No dossier found.";
+                    // 3. HANDLE MISSING USER (The Fix)
+                    // If no profile exists, show default "Classified" info
+                    const fakeData = {
+                        bio: "This agent's dossier is currently classified.",
+                        role: "Unknown Entity",
+                        social: null
+                    };
+                    fetchCache[uid] = fakeData; // Cache the fake data so we don't retry
+                    fillPop(uid, fakeData);
                 }
-            } catch(err) { console.log("Profile fetch error"); }
+            } catch(err) { 
+                console.log("Profile fetch error:", err);
+            }
         };
+
+        function fillPop(uid, data) {
+            // Bio
+            const bioEl = document.getElementById(`bio-${uid}`);
+            if(bioEl) bioEl.innerText = data.bio || "No status report available.";
+            
+            // Socials
+            const socialEl = document.getElementById(`social-${uid}`);
+            if(socialEl) {
+                if(data.social) {
+                    socialEl.innerHTML = `Comms: <a href="https://twitter.com/${data.social.replace('@','')}" target="_blank" style="color:var(--color-red);">${data.social}</a>`;
+                } else {
+                    socialEl.innerText = "Comms: Offline";
+                }
+            }
+
+            // Role Badge (Inside the popup header)
+            const roleEl = document.querySelector(`#pop-${uid} .pop-role`);
+            if(roleEl) {
+                const role = data.role || "BEGINNER MURDERINO";
+                roleEl.innerText = role.toUpperCase();
+                roleEl.style.color = (role === "Administrator") ? "var(--color-red)" : "#888";
+            }
+        }
 
         function fillPop(uid, data) {
             // Bio
