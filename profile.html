@@ -219,31 +219,53 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Navbar
+                
+                // 1. Basic Auth Info
                 document.getElementById('navProfile').style.display = 'flex';
-                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
 
-                // Profile Header
-                document.getElementById('headerAvatar').src = user.photoURL || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                document.getElementById('headerAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('headerName').innerText = (user.displayName || "UNKNOWN AGENT").toUpperCase();
                 document.getElementById('headerEmail').innerText = user.email;
 
-                // Pre-fill Forms (Auth Data)
+                // Pre-fill Forms
                 document.getElementById('inputName').value = user.displayName || "";
                 document.getElementById('inputPhoto').value = user.photoURL || "";
 
-                // Fetch Extended Data (Bio/Socials) from Firestore
-                const docSnap = await getDoc(doc(db, "users", user.uid));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    document.getElementById('inputBio').value = data.bio || "";
-                    document.getElementById('inputSocial').value = data.social || "";
+                // 2. Fetch Extended Data (Role, Bio, Socials) from Firestore
+                try {
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        
+                        document.getElementById('inputBio').value = data.bio || "";
+                        document.getElementById('inputSocial').value = data.social || "";
+
+                        // --- FIX: DISPLAY REAL RANK ---
+                        const roleEl = document.getElementById('headerRole');
+                        const realRole = data.role || "Beginner Murderino";
+                        
+                        roleEl.innerText = realRole.toUpperCase();
+                        
+                        // Special styling for Admin
+                        if(realRole === "Administrator") {
+                            roleEl.style.color = "var(--color-red)";
+                            roleEl.style.borderColor = "var(--color-red)";
+                            roleEl.style.background = "rgba(205,32,31,0.1)";
+                        } else {
+                            // Reset style for others
+                            roleEl.style.color = "#888";
+                            roleEl.style.borderColor = "#333";
+                            roleEl.style.background = "transparent";
+                        }
+                    }
+                } catch (e) {
+                    console.log("Error fetching profile:", e);
                 }
 
             } else {
-                // Not logged in -> Redirect to login
-                window.location.href = "login";
+                window.location.href = "login.html";
             }
         });
 
@@ -268,15 +290,15 @@
                     photoURL: photo
                 });
 
-                // 2. Update Firestore (Extended Info)
+                // 2. Update Firestore (Extended Info - KEEP EXISTING ROLE!)
                 await setDoc(doc(db, "users", currentUser.uid), {
-    displayName: name, // Save name to DB
-    email: currentUser.email, // Save email to DB
-    photo: photo, // Save photo to DB
-    bio: bio,
-    social: social,
-    updatedAt: new Date()
-}, { merge: true });
+                    displayName: name, // Sync name to DB
+                    email: currentUser.email, // Sync email to DB
+                    photo: photo, // Sync photo to DB
+                    bio: bio,
+                    social: social,
+                    updatedAt: new Date()
+                }, { merge: true }); // 'merge: true' ensures we don't overwrite the Role assigned by Admin
 
                 msg.className = "status-msg success";
                 msg.innerText = "PROFILE UPDATED SUCCESSFULLY";
@@ -284,9 +306,9 @@
                 
                 // Refresh visuals immediately
                 document.getElementById('headerName').innerText = name.toUpperCase();
-                document.getElementById('headerAvatar').src = photo || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                document.getElementById('headerAvatar').src = photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = name.toUpperCase();
-                document.getElementById('navAvatar').src = photo || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                document.getElementById('navAvatar').src = photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
 
             } catch (error) {
                 console.error(error);
@@ -294,7 +316,6 @@
                 msg.innerText = "ERROR: " + error.message;
                 btn.innerText = "UPDATE DOSSIER";
             }
-            
         });
 
         // CHANGE PASSWORD
@@ -327,7 +348,7 @@
 
         // LOGOUT
         document.getElementById('navLogoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = "login");
+            signOut(auth).then(() => window.location.href = "login.html");
         });
     </script>
 </body>
