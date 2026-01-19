@@ -75,12 +75,13 @@
         .badge-active { border-color: green; color: green; }
         .badge-banned { border-color: red; color: red; }
 
-        /* EVIDENCE LINKS */
-        .target-link { color: var(--color-red); text-decoration: none; border-bottom: 1px dashed var(--color-red); font-weight: bold; }
+        /* EVIDENCE PREVIEW */
+        .target-link { color: var(--color-red); text-decoration: none; border-bottom: 1px dashed var(--color-red); font-weight: bold; font-size: 0.8rem; }
         .target-link:hover { color: #fff; border-color: #fff; }
-        .evidence-preview { 
-            font-family: 'Special Elite', monospace; color: #e0e0e0; font-size: 0.9rem; 
-            background: rgba(255,255,255,0.05); padding: 8px; margin: 5px 0; border-left: 2px solid var(--color-red);
+        .evidence-box { 
+            background: rgba(255,255,255,0.05); padding: 10px; margin-top: 5px; border-left: 2px solid var(--color-red);
+            font-family: 'Special Elite', monospace; font-size: 0.85rem; color: #ccc;
+            max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .hidden { display: none; }
@@ -96,6 +97,7 @@
     <div id="accessDenied">
         <div class="denied-text">ACCESS DENIED</div>
         <p style="font-family: 'Special Elite'; color: #666; margin-top: 10px;">RESTRICTED TO ADMINISTRATORS ONLY</p>
+        <p id="debugInfo" style="color: #444; font-size: 0.8rem; margin-top: 20px;">Checking credentials...</p>
         <a href="index.html" style="color: #fff; margin-top: 20px; font-family: 'Oswald'; border: 1px solid #fff; padding: 10px 20px; text-decoration: none;">RETURN TO TERMINAL</a>
     </div>
 
@@ -136,7 +138,7 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 40%;">EVIDENCE (TARGET)</th>
+                            <th style="width: 45%;">EVIDENCE (TARGET)</th>
                             <th>VIOLATION</th>
                             <th>DETAILS</th>
                             <th>REPORTER</th>
@@ -154,7 +156,6 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // ADDED 'getDoc' HERE
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -172,15 +173,25 @@
         const auth = getAuth(app);
 
         // *** SECURITY: ADMIN EMAIL LIST ***
+        // MAKE SURE THIS IS EXACTLY YOUR EMAIL
         const ADMIN_EMAILS = ["unnamedthings07@gmail.com"]; 
 
         // 1. AUTH CHECK
         onAuthStateChanged(auth, (user) => {
-            if (user && ADMIN_EMAILS.includes(user.email)) {
-                document.getElementById('accessDenied').style.display = 'none';
-                document.getElementById('adminPanel').classList.remove('hidden');
-                loadUsers();
-                loadReports();
+            const debugEl = document.getElementById('debugInfo');
+            if (user) {
+                console.log("Logged in as:", user.email);
+                
+                if (ADMIN_EMAILS.includes(user.email)) {
+                    document.getElementById('accessDenied').style.display = 'none';
+                    document.getElementById('adminPanel').classList.remove('hidden');
+                    loadUsers();
+                    loadReports();
+                } else {
+                    debugEl.innerText = `Logged in as: ${user.email} (NOT AUTHORIZED)`;
+                }
+            } else {
+                debugEl.innerText = "No active session. Please login on Main Site.";
             }
         });
 
@@ -265,43 +276,40 @@
                 return;
             }
 
-            // Process all reports in parallel to fetch previews
+            // Process reports
             const reportRows = await Promise.all(snap.docs.map(async (docSnap) => {
                 const r = docSnap.data();
                 const rid = docSnap.id;
                 const linkId = r.threadId || r.targetId;
 
-                // --- FETCH CONTENT SNIPPET ---
-                let contentPreview = "Loading content...";
+                // --- FETCH PREVIEW ---
+                let previewText = "Loading content...";
                 try {
-                    if (r.type === 'THREAD') {
-                        const tSnap = await getDoc(doc(db, "threads", r.targetId));
-                        if(tSnap.exists()) contentPreview = "TITLE: " + tSnap.data().title;
-                        else contentPreview = "[CONTENT DELETED]";
+                    // Try to fetch as Thread
+                    let contentSnap = await getDoc(doc(db, "threads", r.targetId));
+                    if(contentSnap.exists()) {
+                        previewText = "THREAD: " + contentSnap.data().title;
                     } else {
-                        const pSnap = await getDoc(doc(db, "posts", r.targetId));
-                        if(pSnap.exists()) {
-                            // Grab first 60 chars
-                            const txt = pSnap.data().body;
-                            contentPreview = `"${txt.substring(0, 60)}${txt.length>60?'...':''}"`;
+                        // Try as Post
+                        contentSnap = await getDoc(doc(db, "posts", r.targetId));
+                        if(contentSnap.exists()) {
+                            let txt = contentSnap.data().body;
+                            previewText = "POST: " + (txt.length > 50 ? txt.substring(0, 50) + "..." : txt);
                         } else {
-                            contentPreview = "[CONTENT DELETED]";
+                            previewText = "[CONTENT DELETED OR NOT FOUND]";
                         }
                     }
-                } catch (e) {
-                    contentPreview = "[ERROR FETCHING DATA]";
-                }
+                } catch (e) { previewText = "[ERROR FETCHING PREVIEW]"; }
 
                 // --- BUILD LINK ---
                 let targetDisplay = `<span style="color:#fff;">${r.type.toUpperCase()}</span>`;
+                
                 if (linkId) {
                     targetDisplay = `
-                        <div style="margin-bottom:5px;">
-                            <a href="index.html?t=${linkId}" target="_blank" class="target-link">
-                                OPEN EVIDENCE &rarr;
-                            </a>
-                        </div>
-                        <div class="evidence-preview">${contentPreview}</div>
+                        <a href="index.html?t=${linkId}" target="_blank" class="target-link">
+                            OPEN EVIDENCE &rarr;
+                        </a>
+                        <div class="evidence-box">${previewText}</div>
                         <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span>
                     `;
                 }
