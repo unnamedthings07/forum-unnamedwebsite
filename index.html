@@ -629,8 +629,11 @@
         // --- REPORTING LOGIC ---
         window.openReportModal = (id, type) => {
             if(!currentUser) return alert("LOGIN REQUIRED TO REPORT");
-            // Pass the currentThreadId so the admin knows where to look
-            activeReportTarget = { id, type, threadId: currentThreadId };
+            
+            // FIX: We grab the global 'currentThreadId' variable
+            const tid = currentThreadId; 
+            
+            activeReportTarget = { id, type, threadId: tid };
             document.getElementById('reportModal').style.display = 'flex';
         };
 
@@ -642,6 +645,8 @@
                 await addDoc(collection(db, "reports"), {
                     targetId: activeReportTarget.id,
                     type: activeReportTarget.type,
+                    // FIX: Save the Thread ID so Admin can link to it
+                    threadId: activeReportTarget.threadId, 
                     reason: reason,
                     details: details,
                     reporter: currentUser.email,

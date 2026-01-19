@@ -250,6 +250,7 @@
         }
 
         // 4. LOAD REPORTS (With Clickable Links)
+        // 4. LOAD REPORTS (FIXED LINKS)
         async function loadReports() {
             const tbody = document.getElementById('reportTableBody');
             const snap = await getDocs(collection(db, "reports"));
@@ -264,16 +265,20 @@
                 const r = docSnap.data();
                 const rid = docSnap.id;
                 
-                // Generate Clickable Link if threadId exists
+                // LOGIC: Determine the correct link ID
+                // If it's a post inside a thread, use threadId. 
+                // If the thread itself is reported, use targetId.
+                const linkId = r.threadId || r.targetId;
+
                 let targetDisplay = `<span style="color:#fff;">${r.type.toUpperCase()}</span> <br> <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span>`;
                 
-                if (r.threadId) {
+                if (linkId) {
                     targetDisplay = `
-                        <a href="index.html?t=${r.threadId}" target="_blank" class="target-link">
-                            ${r.type.toUpperCase()} &rarr; VIEW
+                        <a href="index.html?t=${linkId}" target="_blank" class="target-link" style="color:#CD201F; font-weight:bold; text-decoration:none; border-bottom:1px dashed #CD201F;">
+                            OPEN EVIDENCE &rarr;
                         </a>
                         <br>
-                        <span style="font-size:0.7rem; color:#666;">ID: ${r.targetId}</span>
+                        <span style="font-size:0.7rem; color:#666;">TYPE: ${r.type}</span>
                     `;
                 }
 
