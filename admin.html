@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Command // Unnamed Things</title>
-    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png">
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
@@ -48,7 +48,16 @@
 
         /* --- LAYOUT --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .section-title { font-family: var(--font-head); font-size: 2rem; color: #fff; margin-bottom: 2rem; border-left: 5px solid var(--color-red); padding-left: 20px; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .section-title { font-family: var(--font-head); font-size: 2rem; color: #fff; border-left: 5px solid var(--color-red); padding-left: 20px; margin: 0; }
+
+        /* SEARCH BAR */
+        .search-box {
+            background: #111; border: 1px solid #333; padding: 10px 15px; color: #fff; 
+            font-family: var(--font-mono); width: 300px; transition: 0.3s;
+        }
+        .search-box:focus { border-color: var(--color-red); outline: none; box-shadow: 0 0 10px rgba(205,32,31,0.2); }
 
         /* --- DATA TABLES --- */
         .data-table { width: 100%; border-collapse: collapse; background: #0a0a0a; border: 1px solid #333; }
@@ -57,10 +66,11 @@
         .data-table tr:hover { background: #111; }
 
         /* USER CELLS */
-        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .user-cell { display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; }
+        .user-cell:hover .user-info div { color: var(--color-red); text-decoration: underline; }
         .user-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #444; }
-        .user-info div { font-weight: bold; color: #fff; }
-        .user-info span { font-size: 0.8rem; color: #666; }
+        .user-info div { font-weight: bold; color: #fff; font-family: var(--font-head); letter-spacing: 1px; }
+        .user-info span { font-size: 0.8rem; color: #666; font-family: var(--font-mono); }
 
         /* ACTIONS */
         .btn-action { padding: 5px 10px; border: 1px solid #444; background: transparent; color: #ccc; cursor: pointer; font-family: var(--font-head); font-size: 0.8rem; margin-right: 5px; transition: 0.2s; }
@@ -84,6 +94,17 @@
             max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
+        /* USER MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: none; justify-content: center; align-items: center; }
+        .modal-box { width: 90%; max-width: 500px; background: #111; border: 1px solid var(--color-red); padding: 0; position: relative; }
+        .modal-header { background: #1a1a1a; padding: 1.5rem; border-bottom: 1px solid #333; display: flex; gap: 20px; align-items: center; }
+        .modal-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--color-red); object-fit: cover; }
+        .modal-body { padding: 2rem; font-family: var(--font-mono); color: #ccc; }
+        .detail-row { margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 10px; }
+        .detail-label { color: var(--color-red); font-size: 0.8rem; display: block; margin-bottom: 5px; }
+        .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; color: #666; font-size: 1.5rem; cursor: pointer; }
+        .close-modal:hover { color: #fff; }
+
         .hidden { display: none; }
         
         /* ACCESS DENIED SCREEN */
@@ -101,10 +122,41 @@
         <a href="index.html" style="color: #fff; margin-top: 20px; font-family: 'Oswald'; border: 1px solid #fff; padding: 10px 20px; text-decoration: none;">RETURN TO TERMINAL</a>
     </div>
 
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="close-modal" onclick="document.getElementById('userModal').style.display='none'">&times;</button>
+            <div class="modal-header">
+                <img id="modalImg" src="" class="modal-avatar">
+                <div>
+                    <h2 id="modalName" style="color:#fff; font-family:'Oswald'; margin:0; font-size:1.5rem;">AGENT NAME</h2>
+                    <span id="modalRole" style="color:var(--color-red); font-size:0.9rem;">ROLE</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">BIO / STATUS REPORT</span>
+                    <div id="modalBio">No data available.</div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">CONTACT / HANDLES</span>
+                    <div id="modalSocial">Offline</div>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">DATABASE ID</span>
+                    <div id="modalId" style="font-size:0.7rem; color:#666;">...</div>
+                </div>
+                <div class="detail-row" style="border:none;">
+                    <span class="detail-label">LAST ACTIVE</span>
+                    <div id="modalLastActive">Unknown</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="adminPanel" class="hidden">
         <nav class="navbar">
             <div class="nav-brand">
-                <img src="https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png" class="nav-logo">
+                <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
                 <div class="brand-text">ADMIN COMMAND</div>
             </div>
             <ul class="nav-links">
@@ -117,11 +169,15 @@
         <div class="container">
             
             <div id="tabUsers">
-                <h2 class="section-title">REGISTERED AGENTS</h2>
+                <div class="section-header">
+                    <h2 class="section-title">REGISTERED AGENTS</h2>
+                    <input type="text" id="userSearch" class="search-box" placeholder="SEARCH AGENT NAME OR EMAIL..." onkeyup="window.filterUsers()">
+                </div>
+                
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>IDENTITY</th>
+                            <th>IDENTITY (CLICK TO VIEW)</th>
                             <th>CLEARANCE LEVEL (ROLE)</th>
                             <th>STATUS</th>
                             <th>ACTIONS</th>
@@ -172,16 +228,15 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // *** SECURITY: ADMIN EMAIL LIST ***
-        // MAKE SURE THIS IS EXACTLY YOUR EMAIL
+        // *** ADMIN CONFIG ***
         const ADMIN_EMAILS = ["unnamedboy07@gmail.com"]; 
+
+        let allUsersData = []; // Store users here for search
 
         // 1. AUTH CHECK
         onAuthStateChanged(auth, (user) => {
             const debugEl = document.getElementById('debugInfo');
             if (user) {
-                console.log("Logged in as:", user.email);
-                
                 if (ADMIN_EMAILS.includes(user.email)) {
                     document.getElementById('accessDenied').style.display = 'none';
                     document.getElementById('adminPanel').classList.remove('hidden');
@@ -195,36 +250,47 @@
             }
         });
 
-        // 2. TAB SWITCHING
         window.switchTab = (tab) => {
             document.getElementById('tabUsers').classList.add('hidden');
             document.getElementById('tabReports').classList.add('hidden');
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            
             if(tab === 'users') {
                 document.getElementById('tabUsers').classList.remove('hidden');
-                event.target.classList.add('active');
             } else {
                 document.getElementById('tabReports').classList.remove('hidden');
-                event.target.classList.add('active');
             }
+            event.target.classList.add('active');
         };
 
-        // 3. LOAD USERS
+        // 3. LOAD USERS (AND STORE THEM)
         async function loadUsers() {
-            const tbody = document.getElementById('userTableBody');
             const snap = await getDocs(collection(db, "users"));
+            allUsersData = []; // Reset list
             
-            tbody.innerHTML = "";
             snap.forEach(docSnap => {
                 const u = docSnap.data();
-                const uid = docSnap.id;
-                const isBanned = u.banned === true;
-                
-                const displayName = u.displayName || "Unknown Agent";
-                const displayEmail = u.email || "No Email Data";
-                const displayPhoto = u.photo || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                u.uid = docSnap.id; // Store ID inside object
+                allUsersData.push(u);
+            });
+            
+            renderUserTable(allUsersData);
+        }
 
+        // RENDER TABLE
+        function renderUserTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = "";
+
+            if(users.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px; color:#666;'>NO AGENTS FOUND.</td></tr>";
+                return;
+            }
+
+            users.forEach(u => {
+                const isBanned = u.banned === true;
+                const displayName = u.displayName || "Unknown Agent";
+                const displayPhoto = u.photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+                
                 const roles = ["Administrator", "Experienced Murderino", "Intermediate Murderino", "Beginner Murderino"];
                 let roleOptions = "";
                 roles.forEach(r => {
@@ -234,17 +300,17 @@
 
                 const row = `
                     <tr>
-                        <td>
+                        <td onclick="window.openUserModal('${u.uid}')">
                             <div class="user-cell">
                                 <img src="${displayPhoto}" class="user-img">
                                 <div class="user-info">
                                     <div>${displayName.toUpperCase()}</div>
-                                    <span>${displayEmail}</span>
+                                    <span>${u.email || "No Email"}</span>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <select class="role-select" onchange="window.updateUserRole('${uid}', this.value)">
+                            <select class="role-select" onchange="window.updateUserRole('${u.uid}', this.value)">
                                 ${roleOptions}
                             </select>
                         </td>
@@ -254,16 +320,55 @@
                             </span>
                         </td>
                         <td>
-                            <button class="btn-action ${isBanned ? '' : 'btn-ban'}" onclick="window.toggleBan('${uid}', ${isBanned})">
-                                ${isBanned ? 'UNBAN' : 'BAN AGENT'}
+                            <button class="btn-action ${isBanned ? '' : 'btn-ban'}" onclick="window.toggleBan('${u.uid}', ${isBanned})">
+                                ${isBanned ? 'UNBAN' : 'BAN'}
                             </button>
-                            <button class="btn-action" style="border-color:red; color:red;" onclick="window.deleteUser('${uid}')">DELETE</button>
+                            <button class="btn-action" style="border-color:red; color:red;" onclick="window.deleteUser('${u.uid}')">DELETE</button>
                         </td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
             });
         }
+
+        // SEARCH FUNCTION
+        window.filterUsers = () => {
+            const query = document.getElementById('userSearch').value.toLowerCase();
+            const filtered = allUsersData.filter(u => 
+                (u.displayName && u.displayName.toLowerCase().includes(query)) || 
+                (u.email && u.email.toLowerCase().includes(query))
+            );
+            renderUserTable(filtered);
+        };
+
+        // OPEN USER MODAL (DOSSIER)
+        window.openUserModal = (uid) => {
+            const user = allUsersData.find(u => u.uid === uid);
+            if(!user) return;
+
+            document.getElementById('modalImg').src = user.photo || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
+            document.getElementById('modalName').innerText = (user.displayName || "UNKNOWN").toUpperCase();
+            document.getElementById('modalRole').innerText = (user.role || "Beginner Murderino").toUpperCase();
+            document.getElementById('modalBio').innerText = user.bio || "No status report available.";
+            document.getElementById('modalId').innerText = uid;
+            
+            // Socials
+            if(user.social) {
+                document.getElementById('modalSocial').innerHTML = `<a href="https://twitter.com/${user.social.replace('@','')}" target="_blank" style="color:var(--color-red);">${user.social}</a>`;
+            } else {
+                document.getElementById('modalSocial').innerText = "Offline";
+            }
+
+            // Last Active
+            if(user.lastActive) {
+                const date = user.lastActive.toDate ? user.lastActive.toDate() : new Date(user.lastActive);
+                document.getElementById('modalLastActive').innerText = date.toLocaleString();
+            } else {
+                document.getElementById('modalLastActive').innerText = "Unknown";
+            }
+
+            document.getElementById('userModal').style.display = 'flex';
+        };
 
         // 4. LOAD REPORTS (WITH CONTENT PREVIEW)
         async function loadReports() {
@@ -276,21 +381,17 @@
                 return;
             }
 
-            // Process reports
             const reportRows = await Promise.all(snap.docs.map(async (docSnap) => {
                 const r = docSnap.data();
                 const rid = docSnap.id;
                 const linkId = r.threadId || r.targetId;
 
-                // --- FETCH PREVIEW ---
                 let previewText = "Loading content...";
                 try {
-                    // Try to fetch as Thread
                     let contentSnap = await getDoc(doc(db, "threads", r.targetId));
                     if(contentSnap.exists()) {
                         previewText = "THREAD: " + contentSnap.data().title;
                     } else {
-                        // Try as Post
                         contentSnap = await getDoc(doc(db, "posts", r.targetId));
                         if(contentSnap.exists()) {
                             let txt = contentSnap.data().body;
@@ -301,9 +402,7 @@
                     }
                 } catch (e) { previewText = "[ERROR FETCHING PREVIEW]"; }
 
-                // --- BUILD LINK ---
                 let targetDisplay = `<span style="color:#fff;">${r.type.toUpperCase()}</span>`;
-                
                 if (linkId) {
                     targetDisplay = `
                         <a href="index.html?t=${linkId}" target="_blank" class="target-link">
