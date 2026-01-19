@@ -227,6 +227,12 @@
                 await signOut(auth);
                 showMsg("VERIFICATION SENT. PLEASE CHECK EMAIL.", false);
                 registerForm.reset();
+                await setDoc(doc(db, "users", uc.user.uid), {
+    email: email,
+    displayName: "New Recruit", // Default name
+    role: "Beginner Murderino", // Default role
+    createdAt: new Date()
+});
             } catch (error) { showMsg("ERROR: " + error.message); }
         });
 
