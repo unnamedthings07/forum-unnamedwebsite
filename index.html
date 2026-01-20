@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Community Terminal // Unnamed Things</title>
-    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png">
+    <link rel="icon" type="image/jpeg" href="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto:wght@300;400&family=Special+Elite&display=swap" rel="stylesheet">
     
     <style>
@@ -192,23 +192,23 @@
 
     <nav class="navbar">
         <a href="https://forums.unnamedthings07.qzz.io" class="nav-brand">
-            <img src="https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png" class="nav-logo">
+            <img src="https://i.ibb.co/0jxSvdfH/channels4-profile.jpg" class="nav-logo">
             <div class="brand-text"><span>U</span>nnamed <span>T</span>hings // FORUMS</div>
         </a>
 
         <ul class="nav-links">
             <li><a href="https://www.unnamedthings07.qzz.io" class="nav-link"><span>M</span>AIN DATABASE</a></li>
-            <li><a href="connect" class="nav-link"><span>C</span>ONNECT</a></li>
+            <li><a href="connect.html" class="nav-link"><span>C</span>ONNECT</a></li>
         </ul>
 
         <div class="user-widget">
-            <a href="login" id="navLoginBtn" class="btn-login">LOGIN</a>
+            <a href="login.html" id="navLoginBtn" class="btn-login">LOGIN</a>
             
             <div id="navProfile" class="user-profile">
                 <img id="navAvatar" src="" class="user-avatar">
                 <span id="navName" class="user-name">USER</span>
                 <div class="profile-dropdown">
-                    <a href="profile" class="dropdown-item" style="color:var(--color-red);">PROFILE SETTINGS</a>
+                    <a href="profile.html" class="dropdown-item" style="color:var(--color-red);">PROFILE SETTINGS</a>
                     <button id="navLogoutBtn" class="dropdown-item">DISCONNECT SESSION</button>
                 </div>
             </div>
@@ -245,7 +245,7 @@
             <div class="reply-area">
                 <h3 style="font-family:'Oswald'; color:#fff; margin-bottom:1rem;">TRANSMIT RESPONSE</h3>
                 <div id="replyGate" style="text-align:center; padding:2rem; border:1px dashed #333; color:#666;">
-                    <a href="login" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
+                    <a href="login.html" style="color:var(--color-red); text-decoration:none; font-family:var(--font-head);">AUTHENTICATION REQUIRED</a>
                 </div>
                 <div id="replyForm" class="hidden">
                     <textarea id="replyInput" placeholder="Enter your observation..."></textarea>
@@ -314,13 +314,19 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         let currentUser = null;
+        let currentUserRole = null; // Store role globally
 
         // *** ADMIN SETUP ***
         const ADMIN_EMAILS = ["unnamedboy07@gmail.com"]; 
-        function isAdmin() { return currentUser && ADMIN_EMAILS.includes(currentUser.email); }
+        
+        // UPGRADED ADMIN CHECK (DB Role + Email)
+        function isAdmin() { 
+            return currentUser && (ADMIN_EMAILS.includes(currentUser.email) || currentUserRole === 'Administrator'); 
+        }
 
         // STATE
         let currentThreadId = null;
+        let activeThreadBoardId = null; // Track which board we are in
         let currentPage = 1;
         const POSTS_PER_PAGE = 15;
         let pageCursors = {};
@@ -348,16 +354,20 @@
             currentUser = user;
             
             if(user) {
-                // 1. CHECK IF BANNED
+                // 1. FETCH ROLE & CHECK BAN
                 const userSnap = await getDoc(doc(db, "users", user.uid));
-                if (userSnap.exists() && userSnap.data().banned === true) {
-                    alert("ACCESS DENIED: YOUR ACCOUNT HAS BEEN TERMINATED.");
-                    await signOut(auth);
-                    window.location.reload();
-                    return;
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    if(data.banned === true) {
+                        alert("ACCESS DENIED: YOUR ACCOUNT HAS BEEN TERMINATED.");
+                        await signOut(auth);
+                        window.location.reload();
+                        return;
+                    }
+                    currentUserRole = data.role; // Set Global Role
                 }
 
-                // 2. DATA SYNC (Ensure admin panel has latest info)
+                // 2. DATA SYNC
                 await setDoc(doc(db, "users", user.uid), {
                     displayName: user.displayName || "Unknown",
                     email: user.email,
@@ -367,7 +377,7 @@
 
                 document.getElementById('navLoginBtn').style.display = 'none';
                 document.getElementById('navProfile').style.display = 'flex';
-                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png";
+                document.getElementById('navAvatar').src = user.photoURL || "https://i.ibb.co/0jxSvdfH/channels4-profile.jpg";
                 document.getElementById('navName').innerText = (user.displayName || "USER").toUpperCase();
                 
                 document.getElementById('replyGate').style.display = 'none';
@@ -448,6 +458,8 @@
             const snap = await getDoc(doc(db, "threads", tid));
             if(!snap.exists()) return navigate('/');
             const tData = snap.data();
+            activeThreadBoardId = tData.boardId; // Store board ID
+
             const b = findBoardInfo(tData.boardId);
             updateBreadcrumbs([{text: b ? b.title : "...", onclick: `window.navToBoard('${tData.boardId}')`}, {text: tData.title, active: true}]);
             
@@ -464,11 +476,20 @@
                 </div>`;
             }
 
-            // LOCK STATE
+            // LOCK STATE & ANNOUNCEMENT RESTRICTION
             const replyForm = document.getElementById('replyForm');
             const lockedMsg = document.getElementById('lockedMessage');
-            if(tData.locked) {
+            
+            let isRestricted = (tData.boardId === 'announcements' && !isAdmin());
+            let isLocked = tData.locked;
+
+            if(isRestricted) {
                 replyForm.classList.add('hidden');
+                lockedMsg.innerText = "// READ ONLY FREQUENCY //";
+                lockedMsg.classList.remove('hidden');
+            } else if(isLocked) {
+                replyForm.classList.add('hidden');
+                lockedMsg.innerText = "// THREAD LOCKED BY ADMINISTRATOR //";
                 lockedMsg.classList.remove('hidden');
             } else {
                 if(currentUser) replyForm.classList.remove('hidden');
@@ -546,13 +567,13 @@
                 <div class="post-layout">
                     <div class="post-user-col">
                         <div class="user-hover-trigger" onmouseenter="window.showUserCard(event, '${d.uid}')" onmouseleave="window.hideUserCard()">
-                            <img src="${d.photo||'https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png'}" class="user-avatar-large">
+                            <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="user-avatar-large">
                             <div style="font-family:'Oswald'; color:${color}; margin-top:10px;">${d.author}</div>
                             ${roleBadge}
                             
                             <div class="user-popover" id="pop-${d.uid}">
                                 <div class="pop-header">
-                                    <img src="${d.photo||'https://i.ibb.co/qLDc9kc0/Gemini-Generated-Image-sbm62osbm62osbm6.png'}" class="pop-avatar">
+                                    <img src="${d.photo||'https://i.ibb.co/0jxSvdfH/channels4-profile.jpg'}" class="pop-avatar">
                                     <div>
                                         <div class="pop-name">${d.author}</div>
                                         <div class="pop-role">${roleBadge ? "ADMINISTRATOR" : "ESTABLISHED MURDERINO"}</div>
@@ -674,13 +695,23 @@
             if(confirm("Delete Post?")) { await deleteDoc(doc(db, "posts", pid)); loadPosts(currentPage); }
         };
 
+        // --- RESTRICTED CREATE THREAD ---
         window.openCreateModal = () => {
             if(!currentUser) return alert("LOGIN REQUIRED");
             const sel = document.getElementById('newThreadBoard'); sel.innerHTML = "";
+            
             FORUM_DATA.forEach(c => {
                 let grp = document.createElement('optgroup'); grp.label = c.title;
-                c.boards.forEach(b => { let opt = document.createElement('option'); opt.value = b.id; opt.innerText = b.title; grp.appendChild(opt); });
-                sel.appendChild(grp);
+                c.boards.forEach(b => { 
+                    // RESTRICTION LOGIC: Skip 'announcements' if not admin
+                    if(b.id === 'announcements' && !isAdmin()) return;
+
+                    let opt = document.createElement('option'); 
+                    opt.value = b.id; 
+                    opt.innerText = b.title; 
+                    grp.appendChild(opt); 
+                });
+                if(grp.children.length > 0) sel.appendChild(grp);
             });
             document.getElementById('createModal').style.display = 'flex';
         };
@@ -691,6 +722,11 @@
             const body = document.getElementById('newThreadBody').value;
             if(!title || !body) return alert("MISSING FIELDS");
             
+            // SERVER-SIDE GUARD (simulated)
+            if(bid === 'announcements' && !isAdmin()) {
+                return alert("RESTRICTED FREQUENCY. AUTHORIZATION FAILED.");
+            }
+
             const ref = await addDoc(collection(db, "threads"), {
                 boardId: bid, title: title, body: body, author: currentUser.displayName || "USER",
                 authorEmail: currentUser.email,
@@ -703,6 +739,12 @@
 
         document.getElementById('btnSubmitReply').addEventListener('click', async () => {
             const body = document.getElementById('replyInput').value; if(!body) return;
+            
+            // SERVER-SIDE GUARD
+            if(activeThreadBoardId === 'announcements' && !isAdmin()) {
+                return alert("READ ONLY FREQUENCY. TRANSMISSION BLOCKED.");
+            }
+
             await addDoc(collection(db, "posts"), {
                 threadId: currentThreadId, body: body, author: currentUser.displayName || "USER",
                 authorEmail: currentUser.email,
