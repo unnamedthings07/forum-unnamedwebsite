@@ -119,7 +119,7 @@
         <div class="denied-text">ACCESS DENIED</div>
         <p style="font-family: 'Special Elite'; color: #666; margin-top: 10px;">RESTRICTED TO ADMINISTRATORS ONLY</p>
         <p id="debugInfo" style="color: #444; font-size: 0.8rem; margin-top: 20px;">Checking credentials...</p>
-        <a href="index.html" style="color: #fff; margin-top: 20px; font-family: 'Oswald'; border: 1px solid #fff; padding: 10px 20px; text-decoration: none;">RETURN TO TERMINAL</a>
+        <a href="index" style="color: #fff; margin-top: 20px; font-family: 'Oswald'; border: 1px solid #fff; padding: 10px 20px; text-decoration: none;">RETURN TO TERMINAL</a>
     </div>
 
     <div id="userModal" class="modal-overlay">
@@ -162,7 +162,7 @@
             <ul class="nav-links">
                 <li class="nav-link active" onclick="switchTab('users')">PERSONNEL DATABASE</li>
                 <li class="nav-link" onclick="switchTab('reports')">INCIDENT LOGS</li>
-                <li class="nav-link" onclick="window.location.href='index.html'">EXIT</li>
+                <li class="nav-link" onclick="window.location.href='index'">EXIT</li>
             </ul>
         </nav>
 
@@ -405,7 +405,7 @@
                 let targetDisplay = `<span style="color:#fff;">${r.type.toUpperCase()}</span>`;
                 if (linkId) {
                     targetDisplay = `
-                        <a href="index.html?t=${linkId}" target="_blank" class="target-link">
+                        <a href="index?t=${linkId}" target="_blank" class="target-link">
                             OPEN EVIDENCE &rarr;
                         </a>
                         <div class="evidence-box">${previewText}</div>
